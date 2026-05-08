@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de cotización | Vidrios Alejo SAS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-container">
+      <img src="img/vidrioslogo.png" alt="Vidrios Alejo SAS" class="logo">
+      <h1>Vidrios Alejo SAS</h1>
+    </div>
+    <p class="slogan">Sistema de cotización — calidad y transparencia en cada proyecto</p>
+    <div class="header-actions">
+      <button type="button" id="logoutBtn" class="logout-button">Cerrar sesión</button>
+      <button type="button" class="btn-edit-precios" onclick="location.href='/editar-precios.html'">Editar precios</button>
+    </div>
+  </header>
+
+  <main class="content-container">
+    <section class="quote-section">
+      <h2>Cotizador de vidrios</h2>
+      <p class="section-description">Seleccione el tipo de vidrio para generar su cotización. Los valores se calculan según la lista de precios vigente.</p>
+
+      <div class="menu-buttons">
+        <button type="button" onclick="irCotizar('transparente')">Vidrio transparente</button>
+        <button type="button" onclick="location.href='/bronce.html'">Vidrio bronce</button>
+        <button type="button" onclick="location.href='/azul.html'">Vidrio azul</button>
+        <button type="button" onclick="location.href='/verde.html'">Vidrio verde</button>
+        <button type="button" onclick="irCotizar('gris')">Vidrio gris</button>
+        <button type="button" onclick="irCotizar('grabado')">Vidrio grabado</button>
+        <button type="button" onclick="irCotizar('espejo')">Espejo</button>
+        <button type="button" onclick="irCotizar('laminado')">Vidrio laminado</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <div class="contact-info">
+      <p>Teléfono: +57 3229340900</p>
+      <p>Email: contacto@vidriosalejo.com</p>
+      <p>Dirección: Cll 12 #8-62</p>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2026 Vidrios Alejo SAS. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  window.irCotizar = function(tipo) {
+    localStorage.setItem('tipoSeleccionado', tipo);
+    window.location.href = '/cotizar.html?tipo=' + encodeURIComponent(tipo);
+  };
+
+  const token = localStorage.getItem('token');
+  const currentPath = window.location.pathname;
+  
+  if (!token && !currentPath.includes('/auth/')) {
+    window.location.href = '/auth/login.html';
+  }
+  
+  if (token && currentPath.includes('/auth/')) {
+    window.location.href = '/index.html';
+  }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: '¿Estás seguro de que deseas salir?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ff4d4d',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Cerrar sesión',
+        cancelButtonText: 'Cancelar',
+        customClass: { confirmButton: 'swal-confirm-red' }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem('token');
+          window.location.href = '/auth/login.html';
+        }
+      });
+    });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotización de Vidrios | Vidrios Alejo SAS</title>
+  <link rel="stylesheet" href="cotizacion.css">
+  <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <header class="cotizacion-header">
+    <div class="header-content">
+      <h1>
+        <img src="img/vidrioslogo.png" alt="Logo Vidrios Alejo" class="header-logo">
+        Cotización de Vidrios
+      </h1>
+      <p class="tipo-seleccionado" id="tipo-seleccionado"></p>
+    </div>
+    <a href="/index.html" class="boton-volverinicio">
+      <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+  </header>
+
+  <main class="cotizacion-container">
+    <button id="toggle-panel" class="panel-toggle">
+      <i class="fas fa-list"></i> Lista de Cotizaciones
+    </button>
+
+    <div id="panel-lista" class="cotizacion-panel">
+      <button class="cerrar-panel">×</button> 
+      <h2><i class="fas fa-clipboard-list"></i> Lista de Cotizaciones</h2>
+      <div id="lista-cotizaciones" class="lista-items"></div>
+      <div class="panel-buttons">
+        <button id="boton-total" class="boton-total">
+          <i class="fas fa-calculator"></i> Calcular Total
+        </button>
+        <button id="boton-finalizar" class="boton-finalizar">
+          <i class="fas fa-check-circle"></i> Finalizar Cotización
+        </button>
+      </div>
+    </div>
+
+    <div class="nota-usuario">
+      <p><strong>Nota:</strong> Para poder cotizar, ingrese las medidas en metros y con punto como separador decimal (ej: 1.25).</p>
+    </div>
+
+    <form id="cotizacion-form" class="cotizacion-form">
+      <input type="hidden" name="tipo" id="tipo-input">
+
+      <div class="form-group">
+        <label for="grosor"><i class="fas fa-ruler-vertical"></i> Grosor del vidrio (mm):</label>
+        <select name="grosor" id="grosor" class="form-control" required></select>
+      </div>
+
+      <div class="form-group">
+        <label class="espaciado-extra"><i class="fas fa-arrows-alt-h"></i> Ancho (m):</label>
+        <input type="number" name="ancho" step="any" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-arrows-alt-v"></i> Alto (m):</label>
+        <input type="number" name="alto" step="any" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-cubes"></i> Cantidad:</label>
+        <input type="number" name="cantidad" class="form-control" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" id="boton-cotizar" class="btn-cotizar">
+          <i class="fas fa-calculator"></i> Generar Cotización
+        </button>
+      </div>
+    </form>
+
+    <div id="resultado" class="resultado-cotizacion"></div>
+  </main>
+
+  <div id="modal-total" class="modal-total">
+    <div class="modal-contenido-total">
+      <span class="cerrar-modal">&times;</span>
+      <h2><i class="fas fa-file-alt"></i> Resumen de Cotización</h2>
+      <div class="modal-body">
+        <p id="total-modal-texto"></p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-aceptar-modal">
+          <i class="fas fa-check"></i> Aceptar
+        </button>
+        <button type="button" id="btn-generar-pdf" class="btn-generar-pdf">
+          <i class="fas fa-file-pdf"></i> Descargar PDF
+        </button>
+        <button type="button" id="btn-abrir-envio-correo" class="btn-enviar-correo-modal" disabled>
+          <i class="fas fa-envelope"></i> Enviar por correo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-cliente-pdf" class="modal-cliente-pdf">
+    <div class="modal-contenido-cliente-pdf">
+      <span class="cerrar-modal-cliente-pdf">&times;</span>
+      <h3><i class="fas fa-user-tie"></i> Datos del solicitante</h3>
+      <p>Estos datos se usarán para el PDF y el envío por correo.</p>
+      <div class="cliente-datos-modal-body">
+        <form id="form-cliente-pdf" class="form-cliente-pdf" onsubmit="return false;">
+          <div class="datos-cliente-grid">
+            <div class="form-group">
+              <label for="cliente_nombre"><i class="fas fa-id-card"></i> Nombre:</label>
+              <input type="text" id="cliente_nombre" name="cliente_nombre" class="form-control" required maxlength="120" />
+            </div>
+            <div class="form-group">
+              <label for="cliente_celular"><i class="fas fa-phone"></i> Celular:</label>
+              <input type="tel" id="cliente_celular" name="cliente_celular" class="form-control" required maxlength="25" placeholder="Ej: 3221234567" />
+            </div>
+            <div class="form-group">
+              <label for="cliente_email"><i class="fas fa-envelope"></i> Correo electrónico:</label>
+              <input type="email" id="cliente_email" name="cliente_email" class="form-control" required maxlength="160" placeholder="correo@ejemplo.com" />
+            </div>
+            <div class="form-group">
+              <label for="cliente_direccion"><i class="fas fa-map-marker-alt"></i> Dirección:</label>
+              <textarea id="cliente_direccion" name="cliente_direccion" class="form-control" required maxlength="220" rows="3" placeholder="Calle, Carrera, Barrio, etc."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="cliente_ciudad"><i class="fas fa-city"></i> Ciudad (opcional):</label>
+              <input type="text" id="cliente_ciudad" name="cliente_ciudad" class="form-control" maxlength="80" />
+            </div>
+            <div class="form-group">
+              <label for="cliente_notas"><i class="fas fa-sticky-note"></i> Notas (opcional):</label>
+              <textarea id="cliente_notas" name="cliente_notas" class="form-control" maxlength="300" rows="2" placeholder="Ej: horario preferido, condiciones especiales, etc."></textarea>
+            </div>
+          </div>
+
+          <div class="modal-actions modal-actions-cliente-pdf">
+            <button type="button" id="btn-confirmar-generar-pdf" class="btn-generar-pdf">
+              <i class="fas fa-file-pdf"></i> Generar PDF
+            </button>
+            <button type="button" id="btn-continuar-envio" class="btn-enviar-correo-modal" style="display:none;">
+              <i class="fas fa-paper-plane"></i> Continuar y enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-envio-pdf" class="modal-envio-pdf">
+    <div class="modal-contenido-envio">
+      <span class="cerrar-modal-envio">&times;</span>
+      <h3><i class="fas fa-paper-plane"></i> Enviar Cotización</h3>
+      <p>Indique el correo del destinatario. Recibirá el resumen de la cotización por email.</p>
+      <input type="email" id="contacto-envio" placeholder="correo@ejemplo.com" class="input-contacto" autocomplete="email" />
+      <button type="button" id="btn-enviar-cotizacion" class="btn-enviar-cotizacion">
+        <i class="fas fa-paper-plane"></i> Enviar cotización
+      </button>
+    </div>
+  </div>
+
+  <footer class="cotizacion-footer">
+    <div class="footer-content">
+      <p>&copy; 2026 Vidrios Alejo SAS. Todos los derechos reservados.</p>
+      <p><i class="fas fa-phone"></i> +57 3229340900 | <i class="fas fa-envelope"></i> contacto@vidriosalejo.com</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script src="/js/api-config.js"></script>
+
+  <script src="/js/pdf-generator.js"></script>
+
+  <script src="/js/main.js"></script>
+
+  <script>
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/auth/login.html';
+    }
+  </script>
+</body>
+</html>

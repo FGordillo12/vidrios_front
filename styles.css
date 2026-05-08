@@ -1,0 +1,217 @@
+:root {
+  --va-primary: #2c3e50;
+  --va-accent: #3498db;
+  --va-accent-dark: #2980b9;
+  --va-bg: #f0f4f8;
+  --va-card: #ffffff;
+  --va-footer: #2c3e50;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(180deg, var(--va-bg) 0%, #e8eef3 100%);
+  color: #333;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-header {
+  position: relative;
+  background: linear-gradient(135deg, var(--va-primary) 0%, var(--va-accent) 100%);
+  color: white;
+  padding: 1.75rem 1rem 2rem;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(44, 62, 80, 0.25);
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .logo-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.logo {
+  max-height: 88px;
+  width: auto;
+}
+
+.main-header h1 {
+  font-size: clamp(1.65rem, 4vw, 2.75rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+.slogan {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.95;
+  max-width: 560px;
+  margin: 0 auto 1rem;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.header-actions .btn-edit-precios {
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.header-actions .btn-edit-precios:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.content-container {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.quote-section {
+  background: var(--va-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+  border: 1px solid rgba(52, 152, 219, 0.12);
+  margin-bottom: 2rem;
+}
+
+.quote-section h2 {
+  color: var(--va-primary);
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.section-description {
+  color: #5d6d7e;
+  text-align: center;
+  margin-bottom: 1.75rem;
+  font-size: 1.05rem;
+}
+
+.menu-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.menu-buttons button {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--va-accent), var(--va-accent-dark));
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(52, 152, 219, 0.35);
+}
+
+.menu-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(44, 62, 80, 0.2);
+}
+
+.main-footer {
+  background: var(--va-footer);
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.contact-info {
+  margin-bottom: 1rem;
+}
+
+.contact-info p {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.95;
+}
+
+.copyright {
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+header .logout-button {
+  padding: 10px 18px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+header .logout-button:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+.swal-custom-popup .swal2-styled.swal-confirm-btn {
+  background-color: #ff4d4d !important;
+  background-image: none !important;
+}
+
+.swal-custom-popup .swal2-styled.swal-confirm-btn:hover {
+  background-color: #ff1a1a !important;
+}
+
+@media (max-width: 768px) {
+  .menu-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .header-actions .logout-button,
+  .header-actions .btn-edit-precios {
+    width: 100%;
+    max-width: 280px;
+  }
+}

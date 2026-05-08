@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Precios | Vidrios Alejo SAS</title>
+  <link rel="stylesheet" href="editarprecios.css">
+  <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="/js/api-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+  <!-- Header idéntico al de cotización -->
+  <header class="cotizacion-header">
+    <div class="header-content">
+      <h1>
+        <img src="img/vidrioslogo.png" alt="Logo Vidrios Alejo" class="header-logo">
+        Editar Precios de Vidrios
+      </h1>
+      <p class="tipo-seleccionado" id="tipo-seleccionado"></p>
+    </div>
+    <a href="/index.html" class="boton-volverinicio">
+      <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="cotizacion-container">
+    <div class="selector-container">
+      <label for="selectorTipo"><i class="fas fa-glass-whiskey"></i> Seleccione el tipo de vidrio:</label>
+      <select id="selectorTipo" class="selector-tipo">
+        <option value="" disabled selected>-- Seleccionar --</option>
+      </select>
+    </div>
+
+    <form id="preciosForm" class="precios-form oculto"></form>
+
+    <div class="form-actions">
+      <button type="button" class="btn-guardar" onclick="guardarCambios()">
+        <i class="fas fa-save"></i> Guardar Cambios
+      </button>
+    </div>
+  </main>
+
+  <!-- Footer igual al de cotización -->
+  <footer class="cotizacion-footer">
+    <div class="footer-content">
+      <p>&copy; 2026 Vidrios Alejo SAS. Todos los derechos reservados.</p>
+      <p><i class="fas fa-phone"></i> +57 3229340900 | <i class="fas fa-envelope"></i> contacto@vidriosalejo.com</p>
+    </div>
+  </footer>
+
+  <!-- Script funcional -->
+  <script>
+    const API_BASE = typeof window.API_BASE !== 'undefined' ? window.API_BASE : 'http://localhost:3000';
+    const form = document.getElementById('preciosForm');
+    const selector = document.getElementById('selectorTipo');
+    const token = localStorage.getItem('token');
+    let agrupado = {};
+
+    if (!token) {
+      alert('Debe iniciar sesión');
+      window.location.href = '/auth/login.html';
+    }
+
+    axios.get(`${API_BASE}/api/precios`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(response => {
+      const precios = response.data;
+
+      precios.forEach(p => {
+        const { tipo, grosor, valor } = p;
+        if (!agrupado[tipo]) agrupado[tipo] = {};
+        agrupado[tipo][grosor] = valor;
+      });
+
+      Object.keys(agrupado).forEach(tipo => {
+        const opt = document.createElement('option');
+        opt.value = tipo;
+        opt.textContent = tipo.toUpperCase();
+        selector.appendChild(opt);
+      });
+    })
+    .catch(error => {
+      console.error('❌ Error al obtener precios:', error);
+      alert('No se pudieron cargar los precios.');
+    });
+
+    selector.addEventListener('change', () => {
+      form.innerHTML = '';
+      const tipoSeleccionado = selector.value;
+      const datos = agrupado[tipoSeleccionado];
+      form.classList.remove('oculto');
+
+      const contenedor = document.createElement('div');
+      contenedor.classList.add('tarjeta-tipo');
+      contenedor.innerHTML = `<h3>${tipoSeleccionado.toUpperCase()}</h3>`;
+
+      for (const grosor in datos) {
+        const label = document.createElement('label');
+        label.innerText = grosor.includes('+') ? `Laminado ${grosor}:` : `Grosor ${grosor} mm:`;
+        label.classList.add('input-label');
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.name = `${tipoSeleccionado}__${grosor}`;
+        input.value = datos[grosor];
+        input.placeholder = `Precio para grosor ${grosor}`;
+        input.step = 'any';
+        input.required = true;
+        input.classList.add('input-precio');
+
+        contenedor.appendChild(label);
+        contenedor.appendChild(input);
+      }
+
+      form.appendChild(contenedor);
+    });
+
+    function guardarCambios() {
+      const data = {};
+      const inputs = document.querySelectorAll('#preciosForm input');
+
+      inputs.forEach(input => {
+        const [tipo, grosorRaw] = input.name.split('__');
+        const grosor = grosorRaw.toString();
+        if (!data[tipo]) data[tipo] = {};
+        data[tipo][grosor] = parseFloat(input.value);
+      });
+
+      console.log('➡ Enviando datos:', data);
+
+      axios.post(`${API_BASE}/api/editar-precios`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(() => alert('✅ Precios actualizados correctamente'))
+      .catch(err => {
+        console.error('❌ Error al guardar precios:', err);
+        alert('Error al guardar los precios');
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vidrios bronce | Vidrios Alejo SAS</title>
+  <link rel="stylesheet" href="/subtipos.css">
+  <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  
+  <header class="subtype-header">
+    <div class="header-content">
+      <h1>
+        <img src="img/vidrioslogo.png" alt="Logo Vidrios Alejo" class="header-logo">
+        Vidrios bronce
+      </h1>
+      <p class="subtype-description">Seleccione el subtipo de vidrio bronce para cotizar.</p>
+    </div>
+  </header>
+
+  <main class="subtype-container">
+    <div class="subtype-buttons">
+      <button type="button" class="subtype-btn" onclick="irCotizar('bronce normal')">Bronce normal</button>
+      <button type="button" class="subtype-btn" onclick="irCotizar('bronce reflectivo')">Bronce reflectivo</button>
+    </div>
+
+    <div class="subtype-footer">
+      <a href="/index.html" class="btn-volver">Volver al inicio</a>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="footer-content">
+      <p>&copy; 2026 Vidrios Alejo SAS</p>
+      <p>+57 3229340900 | contacto@vidriosalejo.com</p>
+    </div>
+  </footer>
+
+  <script>
+    function irCotizar(tipo) {
+      localStorage.setItem('tipoSeleccionado', tipo);
+      window.location.href = '/cotizar.html?tipo=' + encodeURIComponent(tipo);
+    }
+
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/auth/login.html';
+    }
+  </script>
+</body>
+</html>
