@@ -35,10 +35,10 @@ window.PDFGenerator = {
     lineaAcabados(item) {
         const partes = [];
         if (item.vidrioPulido) {
-            partes.push(`Pulido: ${this.formatCOP(Number(item.pulidoExtra) || 0)}`);
+            partes.push(`Pulido`);
         }
         if (item.vidrioSandblasteado) {
-            partes.push(`Sandblast: ${this.formatCOP(Number(item.sandblastExtra) || 0)}`);
+            partes.push(`Sandblast`);
         }
         if (!partes.length) return '';
         return `<div style="margin-top:6px;font-size:10px;color:#1a5276;font-weight:600;line-height:1.35;">${partes.join(' · ')}</div>`;
