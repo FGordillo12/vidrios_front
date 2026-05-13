@@ -32,6 +32,18 @@ window.PDFGenerator = {
             .join(' ');
     },
 
+    lineaAcabados(item) {
+        const partes = [];
+        if (item.vidrioPulido) {
+            partes.push(`Pulido: ${this.formatCOP(Number(item.pulidoExtra) || 0)}`);
+        }
+        if (item.vidrioSandblasteado) {
+            partes.push(`Sandblast: ${this.formatCOP(Number(item.sandblastExtra) || 0)}`);
+        }
+        if (!partes.length) return '';
+        return `<div style="margin-top:6px;font-size:10px;color:#1a5276;font-weight:600;line-height:1.35;">${partes.join(' · ')}</div>`;
+    },
+
     async getBase64Image(src) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -77,6 +89,7 @@ window.PDFGenerator = {
                 <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;vertical-align:top;">
                     <div style="font-weight:700;font-size:12px;color:#0F1D35;margin-bottom:3px;">${this.capitalizar(item.tipo)}</div>
                     <div style="font-size:10px;color:#8A93A6;">Vidrio ${item.tipo} — ${item.grosor}${String(item.grosor).includes('+') ? '' : 'mm'} espesor</div>
+                    ${this.lineaAcabados(item)}
                 </td>
                 <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;text-align:center;font-size:12px;color:#3D5280;font-weight:600;vertical-align:middle;">
                     ${item.grosor}${String(item.grosor).includes('+') ? '' : 'mm'}

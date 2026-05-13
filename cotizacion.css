@@ -241,6 +241,157 @@ body {
   text-align: center;
 }
 
+.acabados-group {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+}
+
+.acabados-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.checkbox-row {
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  flex-wrap: wrap;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2980b9;
+  flex-shrink: 0;
+}
+
+.acabados-ayuda {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: -0.25rem 0 0.85rem 28px;
+  line-height: 1.35;
+}
+
+.sandblast-panel {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.sandblast-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 0.45rem;
+}
+
+.btn-link-sandblast {
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  color: #2980b9;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+}
+
+.btn-link-sandblast:hover {
+  color: #1f5f8a;
+}
+
+.modal-sandblast {
+  display: none;
+  position: fixed;
+  z-index: 10050;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-contenido-sandblast {
+  background: white;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.modal-contenido-sandblast h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-sandblast-texto {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+  line-height: 1.45;
+}
+
+.cerrar-modal-sandblast {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cerrar-modal-sandblast:hover {
+  color: #64748b;
+}
+
+.modal-actions-sandblast {
+  margin-top: 1rem;
+}
+
+.btn-aceptar-sandblast {
+  width: 100%;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-aceptar-sandblast:hover {
+  filter: brightness(1.05);
+}
+
 /* Datos del solicitante */
 .cliente-section {
   margin: 0.75rem 0 0.5rem;

@@ -69,6 +69,28 @@
         <input type="number" name="cantidad" class="form-control" required>
       </div>
 
+      <div class="form-group acabados-group">
+        <span class="acabados-titulo"><i class="fas fa-paint-brush"></i> Acabados adicionales</span>
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="vidrio-pulido">
+            Vidrio pulido
+          </label>
+        </div>
+        <p class="acabados-ayuda">El pulido suma un valor fijo por m² según tarifa interna de la empresa.</p>
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="vidrio-sandblast">
+            Vidrio sandblaste (arenado)
+          </label>
+        </div>
+        <div id="sandblast-panel" class="sandblast-panel" hidden>
+          <label for="sandblast-valor" class="sandblast-label">Valor adicional sandblast (COP) — total por este ítem:</label>
+          <input type="number" id="sandblast-valor" class="form-control" min="0" step="any" placeholder="Ej: 45000">
+          <button type="button" id="btn-sandblast-modal" class="btn-link-sandblast">Introducir valor en ventana</button>
+        </div>
+      </div>
+
       <div class="form-actions">
         <button type="submit" id="boton-cotizar" class="btn-cotizar">
           <i class="fas fa-calculator"></i> Generar Cotización
@@ -143,6 +165,18 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-sandblast" class="modal-sandblast">
+    <div class="modal-contenido-sandblast">
+      <span class="cerrar-modal-sandblast">&times;</span>
+      <h3><i class="fas fa-spray-can"></i> Valor sandblast</h3>
+      <p class="modal-sandblast-texto">Ingrese el valor adicional en pesos (COP) para este vidrio. Varía según diseño y complejidad.</p>
+      <input type="number" id="sandblast-valor-modal" class="form-control" min="0" step="any" placeholder="Ej: 45000" />
+      <div class="modal-actions-sandblast">
+        <button type="button" id="btn-aceptar-sandblast" class="btn-aceptar-sandblast">Aceptar</button>
       </div>
     </div>
   </div>

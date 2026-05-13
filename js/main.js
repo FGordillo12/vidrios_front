@@ -124,7 +124,7 @@ function actualizarListaCotizaciones() {
 
       const descripcion = document.createElement('span');
       descripcion.className = 'cotizacion-item-texto';
-      descripcion.textContent = `Grosor: ${cot.grosor}${String(cot.grosor).includes('+') ? '' : ' mm'}, ${cot.anchoOriginal}m × ${cot.altoOriginal}m, Cant: ${cot.cantidad}, Total: ${formatCOP(cot.total)}`;
+      descripcion.textContent = `Grosor: ${cot.grosor}${String(cot.grosor).includes('+') ? '' : ' mm'}, ${cot.anchoOriginal}m × ${cot.altoOriginal}m, Cant: ${cot.cantidad}, Total: ${formatCOP(cot.total)}${textoAcabadosEnListado(cot)}`;
 
       const btnEliminar = document.createElement('button');
       btnEliminar.type = 'button';
@@ -175,6 +175,52 @@ function bloquearRuedaEnInputsNumericos(contenedor) {
   });
 }
 
+function textoAcabadosEnListado(cot) {
+  const partes = [];
+  if (cot.vidrioPulido) partes.push(`Pulido +${formatCOP(Number(cot.pulidoExtra) || 0)}`);
+  if (cot.vidrioSandblasteado) partes.push(`Sandblast +${formatCOP(Number(cot.sandblastExtra) || 0)}`);
+  return partes.length ? ` · ${partes.join(' · ')}` : '';
+}
+
+function configurarAcabadosCotizacion() {
+  const chkPulido = document.getElementById('vidrio-pulido');
+  const chkSand = document.getElementById('vidrio-sandblast');
+  const panelSand = document.getElementById('sandblast-panel');
+  const inputSand = document.getElementById('sandblast-valor');
+  const inputSandModal = document.getElementById('sandblast-valor-modal');
+  const btnModal = document.getElementById('btn-sandblast-modal');
+  const modal = document.getElementById('modal-sandblast');
+  const btnAceptarSand = document.getElementById('btn-aceptar-sandblast');
+  const cerrarSand = document.querySelector('.cerrar-modal-sandblast');
+
+  if (chkSand && panelSand) {
+    chkSand.addEventListener('change', () => {
+      panelSand.hidden = !chkSand.checked;
+      if (!chkSand.checked && inputSand) inputSand.value = '';
+    });
+  }
+
+  if (btnModal && modal && inputSand && inputSandModal) {
+    btnModal.addEventListener('click', () => {
+      inputSandModal.value = inputSand.value || '';
+      modal.style.display = 'flex';
+    });
+  }
+
+  if (btnAceptarSand && modal && inputSand && inputSandModal) {
+    btnAceptarSand.addEventListener('click', () => {
+      inputSand.value = inputSandModal.value || '';
+      modal.style.display = 'none';
+    });
+  }
+
+  if (cerrarSand && modal) {
+    cerrarSand.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
+}
+
 // --- Eventos de Inicialización ---
 window.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -216,6 +262,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const cotizacionFormEl = document.getElementById('cotizacion-form');
   bloquearRuedaEnInputsNumericos(cotizacionFormEl);
+  bloquearRuedaEnInputsNumericos(document.getElementById('modal-sandblast'));
+
+  configurarAcabadosCotizacion();
 
   const listaCotizaciones = document.getElementById('lista-cotizaciones');
   if (listaCotizaciones) {
@@ -256,11 +305,35 @@ if (cotizacionForm) {
 
     const resultado = document.getElementById('resultado');
 
+    const vidrioPulido = document.getElementById('vidrio-pulido')?.checked || false;
+    const vidrioSandblasteado = document.getElementById('vidrio-sandblast')?.checked || false;
+    let sandblastValor = 0;
+    if (vidrioSandblasteado) {
+      const rawSand = String(document.getElementById('sandblast-valor')?.value || '').trim();
+      sandblastValor = parseFloat(rawSand);
+      if (!Number.isFinite(sandblastValor) || sandblastValor <= 0) {
+        resultado.textContent = '❌ Si marca sandblast, indique un valor adicional mayor a 0 (COP).';
+        actualizarListaCotizaciones();
+        return;
+      }
+    }
+
+    const payload = {
+      tipo: data.tipo,
+      ancho: data.ancho,
+      alto: data.alto,
+      cantidad: data.cantidad,
+      grosor: data.grosor,
+      vidrioPulido,
+      vidrioSandblasteado,
+      sandblastValor: vidrioSandblasteado ? sandblastValor : 0
+    };
+
     try {
       const response = await fetch(`${API_BASE}/api/cotizar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
@@ -268,7 +341,10 @@ if (cotizacionForm) {
       if (result.error) {
         resultado.textContent = `❌ Error: ${result.error}`;
       } else {
-        resultado.textContent = `✅ Total: ${formatCOP(result.total)} — Tipo: ${data.tipo} — Grosor: ${result.grosor}${String(result.grosor).includes('+') ? '' : ' mm'} — Medidas: ${anchoOriginalTexto}m × ${altoOriginalTexto}m`;
+        const partesTotal = [`Vidrio: ${formatCOP(Number(result.totalVidrio) || 0)}`];
+        if (Number(result.pulidoExtra) > 0) partesTotal.push(`Pulido: ${formatCOP(result.pulidoExtra)}`);
+        if (Number(result.sandblastExtra) > 0) partesTotal.push(`Sandblast: ${formatCOP(result.sandblastExtra)}`);
+        resultado.textContent = `✅ Total: ${formatCOP(result.total)} (${partesTotal.join(' + ')}) — Tipo: ${data.tipo} — Grosor: ${result.grosor}${String(result.grosor).includes('+') ? '' : ' mm'} — Medidas: ${anchoOriginalTexto}m × ${altoOriginalTexto}m`;
 
         let cotizacionesGuardadas = JSON.parse(localStorage.getItem('cotizaciones')) || [];
 
@@ -282,7 +358,12 @@ if (cotizacionForm) {
           anchoOriginal: anchoOriginalTexto,
           altoOriginal: altoOriginalTexto,
           cantidad: data.cantidad,
-          total: result.total
+          total: result.total,
+          totalVidrio: result.totalVidrio ?? result.total,
+          vidrioPulido: !!result.vidrioPulido,
+          vidrioSandblasteado: !!result.vidrioSandblasteado,
+          pulidoExtra: Number(result.pulidoExtra) || 0,
+          sandblastExtra: Number(result.sandblastExtra) || 0
         };
 
         cotizacionesGuardadas.push(nuevaCotizacion);
@@ -537,7 +618,7 @@ if (btnAbrirEnvioCorreo) {
 }
 
 window.addEventListener('click', (e) => {
-  ['modal-total', 'modal-envio-pdf', 'modal-cliente-pdf'].forEach(id => {
+  ['modal-total', 'modal-envio-pdf', 'modal-cliente-pdf', 'modal-sandblast'].forEach(id => {
     const m = document.getElementById(id);
     if (m && e.target === m) m.style.display = 'none';
   });
