@@ -273,8 +273,8 @@ window.PDFGenerator = {
         <div class="notes-grid">
             <div class="note-item"><span class="note-num">1</span><span>Válido por 15 días calendario.</span></div>
             <div class="note-item"><span class="note-num">2</span><span>Sujeto a rectificación de medidas en obra.</span></div>
-            <div class="note-item"><span class="note-num">3</span><span>Templados no admiten cambios tras fabricación.</span></div>
-            <div class="note-item"><span class="note-num">4</span><span>Precio incluye entrega en zona urbana.</span></div>
+            <div class="note-item"><span class="note-num">3</span><span>Se requiere un anticipo del 50% para iniciar la fabricación, el saldo restante se liquida contra entrega.</span></div>
+            <div class="note-item"><span class="note-num">4</span><span>Precios sujetos a cambios sin previo aviso hasta la confirmación formal del pedido.</span></div>
         </div>
     </div>
 
