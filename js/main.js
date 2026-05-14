@@ -490,10 +490,10 @@ if (btnConfirmarGenerarPdf) {
       notas: getVal('cliente_notas')
     };
 
-    if (!clienteData.nombre || !clienteData.celular || !clienteData.email || !clienteData.direccion) {
-      alert('Completa los datos obligatorios del solicitante.');
+    if (!clienteData.nombre) {
+      alert('El nombre del solicitante es obligatorio.');
       return;
-    }
+    } 
 
     localStorage.setItem('cotizacion_cliente', JSON.stringify(clienteData));
 
