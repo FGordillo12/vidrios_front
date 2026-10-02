@@ -47,7 +47,7 @@
     </div>
 
     <div class="nota-usuario">
-      <p><strong>Nota:</strong> Elija el material y mida en metros, centímetros o milímetros. Las opciones dependen del catálogo vigente.</p>
+      <p><strong>Nota:</strong> Ingrese ancho y alto en centímetros (cm). Ejemplo: 58 × 120 cm equivale a 0,58 × 1,20 m.</p>
     </div>
 
     <form id="cotizacion-form" class="cotizacion-form">
@@ -61,7 +61,9 @@
       </div>
 
       <div class="form-group">
-        <label for="unidad-medida">Unidad de medida:</label><select id="unidad-medida" class="form-control"><option value="m">Metros</option><option value="cm">Centímetros</option><option value="mm">Milímetros</option></select>
+        <label for="unidad-medida-visible">Unidad de medida:</label>
+        <input id="unidad-medida" type="hidden" value="cm">
+        <input id="unidad-medida-visible" class="form-control" value="Centímetros (cm)" readonly aria-readonly="true">
       </div>
       <div class="form-group">
         <label class="espaciado-extra"><i class="fas fa-arrows-alt-h"></i> Ancho:</label>

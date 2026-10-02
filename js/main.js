@@ -46,6 +46,13 @@ function labelGrosor(g) {
   return s.includes('+') ? `${s} (laminado)` : `${s} mm`;
 }
 
+function convertirMedidaACentimetros(medida, unidad = 'cm') {
+  const valor = Number.parseFloat(String(medida ?? '').replace(',', '.'));
+  if (!Number.isFinite(valor)) return medida;
+  const factor = unidad === 'm' ? 100 : unidad === 'mm' ? 0.1 : 1;
+  return Number((valor * factor).toFixed(4));
+}
+
 function capitalizar(texto) {
   if (!texto) return '';
   return texto.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
@@ -342,9 +349,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (item.variante) document.getElementById('variante-select').value = item.variante;
         document.getElementById('variante-select').dispatchEvent(new Event('change'));
         document.getElementById('grosor').value = item.grosor;
-        document.getElementById('cotizacion-form').elements.ancho.value = item.anchoOriginal;
-        document.getElementById('cotizacion-form').elements.alto.value = item.altoOriginal;
-        document.getElementById('unidad-medida').value = item.unidad || 'm';
+        document.getElementById('cotizacion-form').elements.ancho.value = convertirMedidaACentimetros(item.anchoOriginal ?? item.ancho, item.unidad || 'm');
+        document.getElementById('cotizacion-form').elements.alto.value = convertirMedidaACentimetros(item.altoOriginal ?? item.alto, item.unidad || 'm');
+        document.getElementById('unidad-medida').value = 'cm';
         document.getElementById('cotizacion-form').elements.cantidad.value = item.cantidad;
         document.getElementById('vidrio-pulido').checked = !!item.vidrioPulido;
         document.getElementById('vidrio-sandblast').checked = !!item.vidrioSandblasteado;
@@ -384,8 +391,8 @@ if (cotizacionForm) {
     const anchoOriginal = parseFloat(anchoOriginalTexto);
     const altoOriginal = parseFloat(altoOriginalTexto);
 
-    const unidad = document.getElementById('unidad-medida')?.value || 'm';
-    const factor = unidad === 'cm' ? 0.01 : unidad === 'mm' ? 0.001 : 1;
+    const unidad = 'cm';
+    const factor = 0.01;
     data.ancho = anchoOriginal * factor;
     data.alto = altoOriginal * factor;
     data.cantidad = parseInt(data.cantidad, 10);
