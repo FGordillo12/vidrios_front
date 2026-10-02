@@ -22,15 +22,17 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
           role.addEventListener('change', () => updateUser(user._id, { role: role.value }));
           roleCell.append(role);
           const statusCell = document.createElement('td');
-          const status = document.createElement('span'); status.className = `user-status${user.active ? '' : ' inactive'}`;
-          status.textContent = user.active ? 'Activo' : 'Inactivo'; statusCell.append(status);
+          const isPending = user.approvalStatus === 'pending';
+          const status = document.createElement('span'); status.className = `user-status${isPending ? ' pending' : user.active ? '' : ' inactive'}`;
+          status.textContent = isPending ? 'Pendiente de aprobación' : user.active ? 'Activo' : 'Desactivado'; statusCell.append(status);
           const actionCell = document.createElement('td');
-          const action = document.createElement('button'); action.className = 'user-action'; action.type = 'button'; action.textContent = user.active ? 'Desactivar' : 'Activar';
+          const action = document.createElement('button'); action.className = 'user-action'; action.type = 'button'; action.textContent = user.active ? 'Desactivar' : isPending ? 'Aprobar cuenta' : 'Activar';
           action.addEventListener('click', () => updateUser(user._id, { active: !user.active })); actionCell.append(action);
           row.append(name, email, roleCell, statusCell, actionCell); body.append(row);
         });
         if (!users.length) body.innerHTML = '<tr><td colspan="5">No hay usuarios registrados.</td></tr>';
-        showMessage(`${users.length} cuenta${users.length === 1 ? '' : 's'} en el sistema.`);
+        const pendingCount = users.filter((user) => user.approvalStatus === 'pending').length;
+        showMessage(`${users.length} cuenta${users.length === 1 ? '' : 's'} en el sistema. ${pendingCount ? `${pendingCount} pendiente${pendingCount === 1 ? '' : 's'} de aprobación.` : ''}`);
       } catch (error) { showMessage(error.message); }
     }
 

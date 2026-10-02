@@ -53,6 +53,10 @@ async function handleLogin(e) {
                 window.location.href = data.redirect || '/index.html';
             }, 1500);
         } else {
+            if (data.code === 'ACCOUNT_PENDING') {
+                window.location.href = data.redirect || '/auth/pendiente.html';
+                return;
+            }
             showMessage(data.error || `Error al iniciar sesión (${response.status})`, 'error');
         }
     } catch (error) {
@@ -102,10 +106,10 @@ async function handleRegister(e) {
         }
 
         if (response.ok) {
-            showMessage('Registro exitoso. Entrando al sistema...', 'success');
+            showMessage(data.message || 'Solicitud recibida. Espera la aprobación de un administrador.', 'success');
             setTimeout(() => {
-                window.location.href = data.redirect || '/index.html';
-            }, 900);
+                window.location.href = data.redirect || '/auth/pendiente.html';
+            }, 1100);
         } else {
             showMessage(data.error || `Error al registrar (${response.status})`, 'error');
         }

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11182a">
+  <title>Cuenta pendiente | Vidrios Alejo SAS</title>
+  <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/auth/auth.css">
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .pending-card { text-align: center; }
+    .pending-icon { width: 76px; height: 76px; margin: 0 auto 1rem; display: grid; place-items: center; border: 1px solid rgba(28,207,217,.35); border-radius: 50%; color: var(--va-cyan); background: rgba(28,207,217,.1); font-size: 2rem; }
+    .pending-copy { margin: .8rem 0 1.5rem; color: var(--va-muted); line-height: 1.7; }
+    .pending-note { margin: 0 0 1.5rem; padding: .9rem 1rem; border: 1px solid var(--va-border); border-radius: 14px; color: var(--va-text); background: var(--va-surface-raised); font-size: .9rem; }
+    .pending-back { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: .75rem 1.2rem; border-radius: 12px; color: var(--va-text); background: var(--va-gradient); font-weight: 700; text-decoration: none; }
+    .pending-contact { margin-top: 1.25rem; color: var(--va-muted); font-size: .85rem; }
+    .pending-contact a { color: var(--va-cyan); }
+  </style>
+</head>
+<body>
+  <main class="auth-container pending-card" aria-labelledby="pending-title">
+    <div class="logo-container">
+      <img src="/img/vidrioslogo.png" alt="Vidrios Alejo SAS" class="auth-logo">
+      <h1>Vidrios Alejo SAS</h1>
+    </div>
+    <div class="pending-icon" aria-hidden="true">⌛</div>
+    <h2 id="pending-title">Tu cuenta está en revisión</h2>
+    <p class="pending-copy">Recibimos tu solicitud. Un administrador debe aprobar tu cuenta antes de que puedas ingresar al cotizador.</p>
+    <p class="pending-note">Te recomendamos volver a intentar iniciar sesión cuando administración confirme la activación de tu cuenta.</p>
+    <a class="pending-back" href="/auth/login.html">Volver al inicio de sesión</a>
+    <p class="pending-contact">¿Necesitas ayuda? <a href="mailto:contacto@vidriosalejo.com">Contacta a Vidrios Alejo</a>.</p>
+  </main>
+  <script src="/js/api-config.js"></script>
+  <script src="/js/session.js"></script>
+  <script src="/js/theme.js"></script>
+</body>
+</html>
