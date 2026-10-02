@@ -18,8 +18,21 @@
     .catalog-form label { display: grid; gap: .4rem; color: var(--va-muted); font-size: .82rem; font-weight: 600; }
     .catalog-form input { min-width: 0; padding: .75rem .8rem; }
     .catalog-btn { min-height: 44px; padding: .65rem .9rem; border: 1px solid var(--va-border); border-radius: 11px; color: var(--va-text); background: var(--va-surface); font-weight: 700; cursor: pointer; }
-    .catalog-btn.primary { color: #fff; border: 0; background: var(--va-gradient); }
-    .catalog-btn:hover { border-color: var(--va-cyan); }
+    .catalog-btn.primary { color: var(--va-glass-button-text, #fff); border: 1px solid var(--va-glass-button); background: var(--va-glass-button); }
+    .catalog-btn:hover { border-color: var(--va-glass-button-hover, var(--va-cyan)); }
+    .catalog-btn.primary:hover { background: var(--va-glass-button-hover, var(--va-glass-button)); }
+    .catalog-settings { margin: 1rem 0; border: 1px solid var(--va-border); border-radius: 16px; background: var(--va-surface-raised); overflow: hidden; }
+    .catalog-settings summary { padding: 1rem 1.1rem; color: var(--va-text); font-weight: 700; cursor: pointer; }
+    .catalog-settings summary::marker { color: var(--va-glass-button); }
+    .catalog-settings[open] summary { border-bottom: 1px solid var(--va-border); }
+    .catalog-settings .catalog-form { margin: 0; border: 0; border-radius: 0; background: transparent; }
+    .catalog-settings .catalog-form.quote-settings-form { grid-template-columns: minmax(180px, 320px) auto; }
+    .catalog-settings .catalog-form.company-settings-form { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+    .catalog-settings .catalog-form .wide-field { grid-column: 1 / -1; }
+    .catalog-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 1rem; padding: 1rem; margin: 1.4rem 0 .7rem; border: 1px solid var(--va-border); border-radius: 16px; background: var(--va-surface-raised); }
+    .catalog-search { display: grid; flex: 1; max-width: 560px; gap: .4rem; color: var(--va-muted); font-size: .84rem; font-weight: 700; }
+    .catalog-search input { min-width: 0; padding: .75rem .8rem; }
+    .catalog-count { color: var(--va-muted); font-size: .9rem; white-space: nowrap; }
     .catalog-message { min-height: 1.4rem; color: var(--va-muted); margin: .6rem 0 1rem; }
     .catalog-table-wrap { width: 100%; overflow-x: auto; }
     .catalog-table { width: 100%; min-width: 850px; border-collapse: collapse; }
@@ -27,11 +40,11 @@
     .catalog-table th { color: var(--va-muted); font-size: .75rem; letter-spacing: .07em; text-transform: uppercase; }
     .catalog-table input { min-width: 90px; width: 100%; padding: .55rem; }
     .catalog-row-actions { display: flex; gap: .45rem; }
-    .catalog-toggle { color: var(--va-cyan); }
+    .catalog-toggle { color: var(--va-glass-button); }
     .catalog-delete { color: var(--va-error); }
     .catalog-inactive { opacity: .62; }
-    @media (max-width: 850px) { .catalog-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 520px) { .catalog-top { align-items: flex-start; flex-direction: column; } .catalog-form { grid-template-columns: 1fr; } }
+    @media (max-width: 850px) { .catalog-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } .catalog-settings .catalog-form.quote-settings-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px) { .catalog-page { padding: 1rem .65rem; } .catalog-panel { padding: 1rem; border-radius: 18px; } .catalog-top { align-items: flex-start; flex-direction: column; } .catalog-form, .catalog-settings .catalog-form.quote-settings-form { grid-template-columns: 1fr; } .catalog-settings .catalog-form.company-settings-form { grid-template-columns: 1fr; } .catalog-toolbar { align-items: stretch; flex-direction: column; } .catalog-count { white-space: normal; } }
   </style>
 </head>
 <body>
@@ -48,12 +61,16 @@
         <label>Precio por m² (COP)<input name="precioM2" required type="number" min="0" max="100000000" step="1" value="0"></label>
         <button class="catalog-btn primary" type="submit">Agregar combinación</button>
       </form>
-      <form id="quote-settings-form" class="catalog-form" style="grid-template-columns:minmax(180px, 320px) auto;">
-        <label>Área mínima facturable por pieza (m²)<input name="minM2" type="number" min="0" max="100" step="0.01" value="0"></label>
-        <button class="catalog-btn primary" type="submit">Guardar configuración</button>
-      </form>
-      <h2>Datos comerciales para cotizaciones y PDF</h2>
-      <form id="company-settings-form" class="catalog-form" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));">
+      <details class="catalog-settings">
+        <summary>Configuración del cotizador</summary>
+        <form id="quote-settings-form" class="catalog-form quote-settings-form">
+          <label>Área mínima facturable por pieza (m²)<input name="minM2" type="number" min="0" max="100" step="0.01" value="0"></label>
+          <button class="catalog-btn primary" type="submit">Guardar configuración</button>
+        </form>
+      </details>
+      <details class="catalog-settings">
+        <summary>Datos comerciales para cotizaciones y PDF</summary>
+        <form id="company-settings-form" class="catalog-form company-settings-form">
         <label>Razón social<input name="nombre" required maxlength="100"></label>
         <label>NIT<input name="nit" maxlength="40"></label>
         <label>Dirección<input name="direccion" maxlength="180"></label>
@@ -62,10 +79,17 @@
         <label>Instagram / redes<input name="instagram" maxlength="80"></label>
         <label>Horario de atención<input name="horario" maxlength="100"></label>
         <label>Vigencia predeterminada (días)<input name="vigenciaDias" type="number" min="1" max="365" required></label>
-        <label style="grid-column:1/-1;">Condiciones de pago<input name="condicionesPago" maxlength="300"></label>
+        <label class="wide-field">Condiciones de pago<input name="condicionesPago" maxlength="300"></label>
         <button class="catalog-btn primary" type="submit">Guardar datos comerciales</button>
-      </form>
+        </form>
+      </details>
       <div id="catalog-message" class="catalog-message" aria-live="polite"></div>
+      <div class="catalog-toolbar">
+        <label class="catalog-search" for="catalog-search">Buscar vidrio por nombre, variante o grosor
+          <input id="catalog-search" type="search" autocomplete="off" placeholder="Ej. azul, bronce reflectivo, 5 mm">
+        </label>
+        <span id="catalog-search-count" class="catalog-count" aria-live="polite"></span>
+      </div>
       <div class="catalog-table-wrap">
         <table class="catalog-table">
           <thead><tr><th>Tipo</th><th>Variante</th><th>Grosor</th><th>Precio m² (COP)</th><th>Estado</th><th>Acciones</th></tr></thead>

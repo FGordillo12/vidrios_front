@@ -4,8 +4,25 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
     const form = document.getElementById('catalog-form');
     const settingsForm = document.getElementById('quote-settings-form');
     const companyForm = document.getElementById('company-settings-form');
+    const searchInput = document.getElementById('catalog-search');
+    const searchCount = document.getElementById('catalog-search-count');
     const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
     const say = (text) => { message.textContent = text; };
+    const normalizeSearch = (value) => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
+
+    function filterCatalogRows() {
+      const query = normalizeSearch(searchInput.value);
+      const rows = [...list.querySelectorAll('tr[data-search-text]')];
+      let visible = 0;
+      for (const row of rows) {
+        const matches = !query || row.dataset.searchText.includes(query);
+        row.hidden = !matches;
+        if (matches) visible += 1;
+      }
+      searchCount.textContent = query ? `${visible} de ${rows.length} combinaciones` : `${rows.length} combinaciones`;
+      const emptyRow = list.querySelector('tr:not([data-search-text])');
+      if (emptyRow) emptyRow.hidden = Boolean(query && rows.length);
+    }
 
     async function apiRequest(path, options = {}) {
       const response = await fetch(`${api}${path}`, options);
@@ -20,6 +37,7 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
         list.replaceChildren();
         records.forEach((record) => {
           const row = document.createElement('tr');
+          row.dataset.searchText = normalizeSearch([record.tipo, record.variante, record.grosorMm].join(' '));
           if (!record.activo) row.classList.add('catalog-inactive');
           const type = document.createElement('td');
           const variant = document.createElement('td');
@@ -55,6 +73,7 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
         });
         if (!records.length) list.innerHTML = '<tr><td colspan="6">No hay combinaciones registradas.</td></tr>';
         say(`${records.length} combinaciones en el catálogo.`);
+        filterCatalogRows();
       } catch (error) { say(error.message); }
     }
 
@@ -92,4 +111,5 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
       } catch (error) { say(error.message); }
     });
 
+    searchInput.addEventListener('input', filterCatalogRows);
     loadCatalog();
