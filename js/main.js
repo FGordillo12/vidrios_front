@@ -263,8 +263,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     const botonCotizar = document.getElementById('boton-cotizar');
     try {
       const response = await fetch(`${API_BASE}/api/catalogo`);
-      if (!response.ok) throw new Error('No se pudo consultar el catálogo');
+      if (!response.ok) {
+        const detail = await response.json().catch(() => ({}));
+        const friendly = response.status === 503
+          ? 'El backend está activo, pero no consigue conectarse a MongoDB. Revisa la URI de Atlas en vidrios_back/.env y reinicia el backend.'
+          : response.status === 401
+            ? 'Tu sesión venció. Inicia sesión para cargar el catálogo.'
+            : (detail.error || `El servidor respondió ${response.status}`);
+        const error = new Error(detail.code ? detail.error : friendly);
+        error.status = response.status;
+        throw error;
+      }
       catalogoCotizador = await response.json();
+      if (!catalogoCotizador.length) throw new Error('La base respondió, pero el catálogo no tiene vidrios activos. Un administrador debe cargar o activar los productos.');
       const tipos = [...new Set(catalogoCotizador.map((g) => g.tipo))];
       tipoSelect.replaceChildren(...tipos.map((t) => { const option = document.createElement('option'); option.value = t; option.textContent = capitalizar(t); return option; }));
       if (tipo && tipos.includes(tipo)) tipoSelect.value = tipo;
@@ -290,9 +301,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       grosorSelect.addEventListener('change', refreshThickness);
       refreshCatalogChoices();
     } catch (err) {
-      tipoSelect.innerHTML = '<option value="">No se pudo cargar el catálogo</option>';
+      tipoSelect.replaceChildren(new Option(err.message.startsWith('La base respondió') ? 'Catálogo vacío' : 'No disponible', ''));
       if (botonCotizar) botonCotizar.disabled = true;
-      tipoTexto.textContent = 'Inicia sesión y verifica que haya vidrios activos en el catálogo.';
+      tipoTexto.textContent = err.status === 401
+        ? 'Tu sesión venció. Inicia sesión para cargar el catálogo.'
+        : `No se pudo cargar el catálogo: ${err.message}`;
     }
   }
 

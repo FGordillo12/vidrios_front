@@ -33,14 +33,25 @@
   window.fetch = (input, init) => send(input, init);
   window.vaSession = {
     async currentUser() {
-      const response = await send(`${apiBase}/api/me`);
+      let response;
+      try { response = await send(`${apiBase}/api/me`); }
+      catch {
+        const error = new Error('No se pudo contactar al backend local en http://localhost:3000. Inícialo y verifica la conexión con MongoDB.');
+        error.status = 503;
+        throw error;
+      }
+      if (response.status >= 500) {
+        const error = new Error('El servidor está activo, pero no logra conectarse a MongoDB. Revisa vidrios_back/.env y el estado de MongoDB Atlas.');
+        error.status = response.status;
+        throw error;
+      }
       return response.ok ? response.json() : null;
     },
     async guard() {
       const path = location.pathname;
       const isAuth = path.startsWith('/auth/');
       const isRecovery = /forgot-password|reset-password/.test(path);
-      const isProtected = !isAuth && path.endsWith('.html');
+      const isProtected = !isAuth && !isRecovery;
       if (!isProtected && (!isAuth || isRecovery)) return null;
       const user = await this.currentUser();
       if (isProtected && !user) {
@@ -69,7 +80,19 @@
       localStorage.removeItem('token');
       localStorage.removeItem('cotizacion_cliente');
       await window.vaSession.guard();
-    } catch {
+    } catch (error) {
+      if (error?.status >= 500) {
+        if (!document.getElementById('va-session-error')) {
+          document.body.classList.add('has-session-error');
+          const notice = document.createElement('div');
+          notice.id = 'va-session-error';
+          notice.className = 'va-session-error';
+          notice.setAttribute('role', 'alert');
+          notice.textContent = error.message;
+          document.body.prepend(notice);
+        }
+        return;
+      }
       if (!location.pathname.startsWith('/auth/')) location.replace('/auth/login.html');
     }
     const logout = document.getElementById('logoutBtn');

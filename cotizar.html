@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cotización de Vidrios | Vidrios Alejo SAS</title>
-  <link rel="stylesheet" href="cotizacion.css">
+  <link rel="stylesheet" href="cotizacion.css?v=20261001-responsive">
   <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/theme.css?v=20261001-responsive">
 </head>
 <body>
   <header class="cotizacion-header">
@@ -25,10 +25,12 @@
   </header>
 
   <main class="cotizacion-container">
-    <button id="toggle-panel" class="panel-toggle">
-      <i class="fas fa-list"></i> Lista de Cotizaciones
-    </button>
-    <a class="panel-toggle" href="/cotizaciones.html"><i class="fas fa-clock-rotate-left"></i> Historial de cotizaciones</a>
+    <nav class="cotizacion-actions" aria-label="Acciones de cotización">
+      <button id="toggle-panel" class="panel-toggle" type="button">
+        <i class="fas fa-list"></i> Lista de Cotizaciones
+      </button>
+      <a class="history-link" href="/cotizaciones.html"><i class="fas fa-clock-rotate-left"></i> Historial de cotizaciones</a>
+    </nav>
 
     <div id="panel-lista" class="cotizacion-panel">
       <button class="cerrar-panel">×</button> 
