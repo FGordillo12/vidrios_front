@@ -8,6 +8,7 @@
   <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
   <header class="main-header">
@@ -19,6 +20,7 @@
     <div class="header-actions">
       <button type="button" id="logoutBtn" class="logout-button">Cerrar sesión</button>
       <button type="button" class="btn-edit-precios" onclick="location.href='/editar-precios.html'">Editar precios</button>
+      <button type="button" id="users-admin-link" class="btn-edit-precios" onclick="location.href='/admin-usuarios.html'" hidden>Usuarios y roles</button>
     </div>
   </header>
 
@@ -58,40 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.location.href = '/cotizar.html?tipo=' + encodeURIComponent(tipo);
   };
 
-  const token = localStorage.getItem('token');
-  const currentPath = window.location.pathname;
-  
-  if (!token && !currentPath.includes('/auth/')) {
-    window.location.href = '/auth/login.html';
-  }
-  
-  if (token && currentPath.includes('/auth/')) {
-    window.location.href = '/index.html';
-  }
-
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: '¿Estás seguro de que deseas salir?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#ff4d4d',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Cerrar sesión',
-        cancelButtonText: 'Cancelar',
-        customClass: { confirmButton: 'swal-confirm-red' }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          localStorage.removeItem('token');
-          window.location.href = '/auth/login.html';
-        }
-      });
-    });
-  }
 });
 </script>
+  <script src="/js/session.js"></script>
+  <script src="/js/theme.js"></script>
 </body>
 </html>

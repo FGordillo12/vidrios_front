@@ -24,6 +24,7 @@ const grosoresPorTipo = {
 };
 
 let cotizaciones = JSON.parse(localStorage.getItem('cotizaciones')) || [];
+let cotizacionClienteActual = {};
 
 // --- Utilidades ---
 function formatCOP(valor) {
@@ -441,8 +442,7 @@ if (btnGenerarPdf) {
     const modalCliente = document.getElementById('modal-cliente-pdf');
     if (!modalCliente) return;
 
-    // Prefill desde la última vez (si existe)
-    const cliente = JSON.parse(localStorage.getItem('cotizacion_cliente') || '{}') || {};
+    const cliente = cotizacionClienteActual;
     const setVal = (id, val) => {
       const el = document.getElementById(id);
       if (el) el.value = (val || '').toString();
@@ -495,7 +495,7 @@ if (btnConfirmarGenerarPdf) {
       return;
     } 
 
-    localStorage.setItem('cotizacion_cliente', JSON.stringify(clienteData));
+    cotizacionClienteActual = clienteData;
 
     const btnConfirmar = document.getElementById('btn-confirmar-generar-pdf');
     const btnContinuar = document.getElementById('btn-continuar-envio');
@@ -554,14 +554,6 @@ if (btnEnviarCotizacion) {
     const contactoInput = document.getElementById('contacto-envio');
     const contacto = contactoInput ? contactoInput.value.trim() : '';
     const cotizacionesGuardadas = JSON.parse(localStorage.getItem('cotizaciones')) || [];
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      alert('Debes iniciar sesión para enviar la cotización.');
-      window.location.href = '/auth/login.html';
-      return;
-    }
-
     if (!contacto) { alert('Ingresa un correo o dato de contacto.'); return; }
     if (cotizacionesGuardadas.length === 0) { alert('No hay cotizaciones registradas para enviar.'); return; }
 
@@ -569,14 +561,11 @@ if (btnEnviarCotizacion) {
       const pdf = JSON.parse(sessionStorage.getItem('cotizacion_pdf') || '{}') || {};
       const pdfBase64 = pdf.pdfBase64;
       const pdfFilename = pdf.pdfFilename;
-      const clienteData = JSON.parse(localStorage.getItem('cotizacion_cliente') || '{}') || {};
+      const clienteData = cotizacionClienteActual;
 
       const res = await fetch(`${API_BASE}/api/enviar-cotizacion`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contacto, cotizaciones: cotizacionesGuardadas, pdfBase64, pdfFilename, cliente: clienteData })
       });
 

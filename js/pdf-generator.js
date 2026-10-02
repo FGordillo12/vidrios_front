@@ -305,7 +305,7 @@ window.PDFGenerator = {
         try {
             const logoBase64 = await this.getBase64Image('/img/vidrioslogo.png');
             const refId = `VA-${Date.now().toString(36).toUpperCase().slice(-6)}`;
-            const cliente = clienteData || JSON.parse(localStorage.getItem('cotizacion_cliente') || '{}');
+            const cliente = clienteData || {};
             const htmlString = this.generarHTML(cotizacionesGuardadas, refId, logoBase64, cliente);
 
             // Contenedor temporal (fuera de la vista)

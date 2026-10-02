@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuarios y roles | Vidrios Alejo SAS</title>
+  <link rel="icon" href="/img/vidrioslogo.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .users-page { width: min(1100px, 100%); margin: auto; padding: 2rem 1rem; position: relative; z-index: 1; }
+    .users-card { padding: clamp(1.25rem, 4vw, 2rem); border: 1px solid var(--va-border); border-radius: 24px; background: var(--va-surface); box-shadow: var(--va-shadow); overflow-x: auto; }
+    .users-card h1 { margin: 0 0 .5rem; font-size: clamp(1.6rem, 4vw, 2.2rem); }
+    .users-card p { color: var(--va-muted); margin: 0 0 1.5rem; }
+    .users-table { width: 100%; border-collapse: collapse; min-width: 650px; }
+    .users-table th, .users-table td { padding: .9rem .75rem; border-bottom: 1px solid var(--va-border); text-align: left; }
+    .users-table th { color: var(--va-muted); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+    .users-table select { min-height: 40px; padding: .4rem .65rem; }
+    .user-status { display: inline-flex; padding: .35rem .65rem; border-radius: 999px; background: rgba(52,211,153,.12); color: var(--va-success); font-size: .8rem; font-weight: 700; }
+    .user-status.inactive { background: rgba(248,113,113,.12); color: var(--va-error); }
+    .user-action { min-height: 40px; padding: .45rem .8rem; border: 1px solid var(--va-border); border-radius: 10px; color: var(--va-text); background: var(--va-surface-raised); cursor: pointer; }
+    .user-action:hover { border-color: var(--va-cyan); }
+    .users-message { min-height: 1.5rem; margin: .8rem 0; color: var(--va-muted); }
+    .users-back { display: inline-flex; margin-bottom: 1rem; color: var(--va-cyan); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="users-page">
+    <a class="users-back" href="/index.html">← Volver al cotizador</a>
+    <section class="users-card">
+      <h1>Usuarios y roles</h1>
+      <p>Administra el acceso de las cuentas registradas.</p>
+      <div id="users-message" class="users-message" aria-live="polite"></div>
+      <table class="users-table">
+        <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody id="users-list"><tr><td colspan="5">Cargando usuarios…</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/js/api-config.js"></script>
+  <script src="/js/session.js"></script>
+  <script src="/js/theme.js"></script>
+  <script>
+    const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost', '127.0.0.1'].includes(location.hostname) ? 'http://localhost:3000' : '');
+    const body = document.getElementById('users-list');
+    const message = document.getElementById('users-message');
+    const showMessage = (text) => { message.textContent = text; };
+
+    async function loadUsers() {
+      try {
+        const response = await fetch(`${api}/api/admin/users`);
+        const users = await response.json();
+        if (!response.ok) throw new Error(users.error || 'No se pudieron cargar las cuentas');
+        body.replaceChildren();
+        users.forEach((user) => {
+          const row = document.createElement('tr');
+          const name = document.createElement('td'); name.textContent = user.username;
+          const email = document.createElement('td'); email.textContent = user.email;
+          const roleCell = document.createElement('td');
+          const role = document.createElement('select'); role.setAttribute('aria-label', `Rol de ${user.username}`);
+          [['user', 'Usuario'], ['admin', 'Administrador']].forEach(([value, label]) => {
+            const option = document.createElement('option'); option.value = value; option.textContent = label; role.append(option);
+          });
+          role.value = user.role;
+          role.addEventListener('change', () => updateUser(user._id, { role: role.value }));
+          roleCell.append(role);
+          const statusCell = document.createElement('td');
+          const status = document.createElement('span'); status.className = `user-status${user.active ? '' : ' inactive'}`;
+          status.textContent = user.active ? 'Activo' : 'Inactivo'; statusCell.append(status);
+          const actionCell = document.createElement('td');
+          const action = document.createElement('button'); action.className = 'user-action'; action.type = 'button'; action.textContent = user.active ? 'Desactivar' : 'Activar';
+          action.addEventListener('click', () => updateUser(user._id, { active: !user.active })); actionCell.append(action);
+          row.append(name, email, roleCell, statusCell, actionCell); body.append(row);
+        });
+        if (!users.length) body.innerHTML = '<tr><td colspan="5">No hay usuarios registrados.</td></tr>';
+        showMessage(`${users.length} cuenta${users.length === 1 ? '' : 's'} en el sistema.`);
+      } catch (error) { showMessage(error.message); }
+    }
+
+    async function updateUser(id, changes) {
+      try {
+        const response = await fetch(`${api}/api/admin/users/${encodeURIComponent(id)}`, {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changes)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'No se pudo actualizar la cuenta');
+        showMessage('Cambios guardados.'); await loadUsers();
+      } catch (error) { showMessage(error.message); await loadUsers(); }
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>

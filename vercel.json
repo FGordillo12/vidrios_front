@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://vidrios-back.vercel.app/api/:path*"
+    },
+    {
+      "source": "/cotizar",
+      "destination": "https://vidrios-back.vercel.app/cotizar"
+    }
+  ]
+}

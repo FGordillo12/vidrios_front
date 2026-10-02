@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     initializeForms();
-    checkAuth(); // ← movido aquí, ya no se llama al final
 });
 
 const API_BASE = typeof window.API_BASE !== 'undefined' ? window.API_BASE : 'http://localhost:3000';
@@ -45,8 +44,6 @@ async function handleLogin(e) {
         }
 
         if (response.ok) {
-            localStorage.setItem('token', data.token);
-
             const modal = document.getElementById('loadingModal');
             if (modal) {
                 modal.style.display = 'flex';
@@ -105,9 +102,6 @@ async function handleRegister(e) {
         }
 
         if (response.ok) {
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-            }
             showMessage('Registro exitoso. Entrando al sistema...', 'success');
             setTimeout(() => {
                 window.location.href = data.redirect || '/index.html';
@@ -123,28 +117,7 @@ async function handleRegister(e) {
 
 // Verificación de autenticación para páginas protegidas
 function checkAuth() {
-    const publicPages = [
-        '/auth/login',
-        '/auth/login.html',
-        '/auth/register',
-        '/auth/register.html',
-        '/auth/forgot-password',
-        '/auth/forgot-password.html',
-        '/auth/reset-password',
-        '/auth/reset-password.html'
-    ];
-
-    const isPublicPage = publicPages.some(page =>
-        window.location.pathname === page ||
-        window.location.pathname.endsWith(page)
-    );
-
-    if (isPublicPage) return;
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/auth/login';
-    }
+    window.vaSession?.guard();
 }
 
 // Mostrar mensajes al usuario

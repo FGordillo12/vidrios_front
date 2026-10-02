@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="/js/api-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
 
@@ -58,16 +59,10 @@
     const API_BASE = typeof window.API_BASE !== 'undefined' ? window.API_BASE : 'http://localhost:3000';
     const form = document.getElementById('preciosForm');
     const selector = document.getElementById('selectorTipo');
-    const token = localStorage.getItem('token');
     let agrupado = {};
 
-    if (!token) {
-      alert('Debe iniciar sesión');
-      window.location.href = '/auth/login.html';
-    }
-
     axios.get(`${API_BASE}/api/precios`, {
-      headers: { Authorization: `Bearer ${token}` }
+      withCredentials: true
     })
     .then(response => {
       const precios = response.data;
@@ -135,7 +130,8 @@
       console.log('➡ Enviando datos:', data);
 
       axios.post(`${API_BASE}/api/editar-precios`, data, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true,
+        headers: { 'X-CSRF-Token': decodeURIComponent(document.cookie.split('; ').find((item) => item.startsWith('va_csrf='))?.split('=').slice(1).join('=') || '') }
       })
       .then(() => alert('✅ Precios actualizados correctamente'))
       .catch(err => {
@@ -144,5 +140,7 @@
       });
     }
   </script>
+  <script src="/js/session.js"></script>
+  <script src="/js/theme.js"></script>
 </body>
 </html>
