@@ -37,11 +37,11 @@
   --va-glass-button-hover: #1d4ed8;
   --va-glass-button-text: #ffffff;
   --va-glass-button-focus: rgba(37, 99, 235, .4);
-  --va-field-bg: #f3f6fb;
-  --va-field-border: #8494aa;
+  --va-field-bg: #ffffff;
+  --va-field-border: #64748b;
   --va-field-focus: #1d4ed8;
-  --va-field-focus-ring: rgba(37, 99, 235, .2);
-  --va-field-placeholder: #596b84;
+  --va-field-focus-ring: rgba(37, 99, 235, .28);
+  --va-field-placeholder: #475569;
   --va-shadow: 0 22px 60px rgba(30, 58, 100, .1);
 }
 

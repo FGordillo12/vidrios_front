@@ -6,6 +6,8 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
     const companyForm = document.getElementById('company-settings-form');
     const searchInput = document.getElementById('catalog-search');
     const searchCount = document.getElementById('catalog-search-count');
+    const summaryCount = document.getElementById('catalog-summary-count');
+    const catalogDetails = document.getElementById('catalog-list-details');
     const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
     const say = (text) => { message.textContent = text; };
     const normalizeSearch = (value) => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
@@ -20,6 +22,8 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
         if (matches) visible += 1;
       }
       searchCount.textContent = query ? `${visible} de ${rows.length} combinaciones` : `${rows.length} combinaciones`;
+      summaryCount.textContent = query ? `${visible} coincidencias de ${rows.length}` : `${rows.length} combinaciones`;
+      if (query) catalogDetails.open = true;
       const emptyRow = list.querySelector('tr:not([data-search-text])');
       if (emptyRow) emptyRow.hidden = Boolean(query && rows.length);
     }

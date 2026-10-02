@@ -23,6 +23,8 @@
     .catalog-btn.primary:hover { background: var(--va-glass-button-hover, var(--va-glass-button)); }
     .catalog-settings { margin: 1rem 0; border: 1px solid var(--va-border); border-radius: 16px; background: var(--va-surface-raised); overflow: hidden; }
     .catalog-settings summary { padding: 1rem 1.1rem; color: var(--va-text); font-weight: 700; cursor: pointer; }
+    .catalog-settings summary.catalog-list-summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .catalog-settings summary.catalog-list-summary span { color: var(--va-muted); font-size: .9rem; font-weight: 500; }
     .catalog-settings summary::marker { color: var(--va-glass-button); }
     .catalog-settings[open] summary { border-bottom: 1px solid var(--va-border); }
     .catalog-settings .catalog-form { margin: 0; border: 0; border-radius: 0; background: transparent; }
@@ -90,12 +92,15 @@
         </label>
         <span id="catalog-search-count" class="catalog-count" aria-live="polite"></span>
       </div>
-      <div class="catalog-table-wrap">
-        <table class="catalog-table">
-          <thead><tr><th>Tipo</th><th>Variante</th><th>Grosor</th><th>Precio m² (COP)</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="catalog-list"><tr><td colspan="6">Cargando catálogo…</td></tr></tbody>
-        </table>
-      </div>
+      <details id="catalog-list-details" class="catalog-settings">
+        <summary class="catalog-list-summary">Lista de precios del catálogo <span id="catalog-summary-count">Cargando…</span></summary>
+        <div class="catalog-table-wrap">
+          <table class="catalog-table">
+            <thead><tr><th>Tipo</th><th>Variante</th><th>Grosor</th><th>Precio m² (COP)</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="catalog-list"><tr><td colspan="6">Cargando catálogo…</td></tr></tbody>
+          </table>
+        </div>
+      </details>
     </section>
   </main>
   <script src="/js/api-config.js"></script>
