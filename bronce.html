@@ -23,8 +23,8 @@
 
   <main class="subtype-container">
     <div class="subtype-buttons">
-      <button type="button" class="subtype-btn" onclick="irCotizar('bronce normal')">Bronce normal</button>
-      <button type="button" class="subtype-btn" onclick="irCotizar('bronce reflectivo')">Bronce reflectivo</button>
+      <button type="button" class="subtype-btn" data-tipo="bronce normal">Bronce normal</button>
+      <button type="button" class="subtype-btn" data-tipo="bronce reflectivo">Bronce reflectivo</button>
     </div>
 
     <div class="subtype-footer">
@@ -39,13 +39,7 @@
     </div>
   </footer>
 
-  <script>
-    function irCotizar(tipo) {
-      localStorage.setItem('tipoSeleccionado', tipo);
-      window.location.href = '/cotizar.html?tipo=' + encodeURIComponent(tipo);
-    }
-
-  </script>
+  <script src="/js/home.js"></script>
   <script src="/js/session.js"></script>
   <script src="/js/theme.js"></script>
 </body>

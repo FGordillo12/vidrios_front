@@ -47,7 +47,7 @@
         location.replace('/auth/login.html');
         return null;
       }
-      if (path.endsWith('/editar-precios.html') && user?.role !== 'admin') {
+      if ((path.endsWith('/editar-precios.html') || path.endsWith('/catalogo.html')) && user?.role !== 'admin') {
         location.replace('/index.html');
         return null;
       }

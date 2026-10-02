@@ -35,13 +35,13 @@ window.PDFGenerator = {
     lineaAcabados(item) {
         const partes = [];
         if (item.vidrioPulido) {
-            partes.push(`Pulido`);
+            partes.push(`Pulido ${this.formatCOP(item.pulidoExtra || 0)}`);
         }
         if (item.vidrioSandblasteado) {
-            partes.push(`Sandblast`);
+            partes.push(`Sandblast ${this.formatCOP(item.sandblastExtra || 0)}`);
         }
         if (!partes.length) return '';
-        return `<div style="margin-top:6px;font-size:10px;color:#1a5276;font-weight:600;line-height:1.35;">${partes.join(' · ')}</div>`;
+        return `<div style="margin-top:6px;font-size:9px;color:#1a5276;font-weight:600;line-height:1.35;">${partes.map((parte) => this.escapeHtml(parte)).join(' · ')}</div>`;
     },
 
     async getBase64Image(src) {
@@ -61,24 +61,35 @@ window.PDFGenerator = {
         });
     },
 
-    generarHTML(cotizacionesList, refId, logoBase64, clienteData) {
+    generarHTML(cotizacionesList, refId, logoBase64, clienteData, quoteData = {}, companyData = {}) {
         const total = cotizacionesList.reduce((sum, item) => sum + item.total, 0);
+        const empresa = {
+            nombre: 'Vidrios Alejo SAS', nit: '901.452.128-4', direccion: 'Calle 12 #8-62, Ubaté - Cundinamarca',
+            telefono: '+57 322 934 0900', email: 'contacto@vidriosalejo.com', instagram: '@vidrios_alejo_sas',
+            horario: 'Lun – Sáb · 7:30 AM – 5:00 PM', ...companyData
+        };
 
-        const cliente = clienteData || {};
+        const cliente = quoteData.customer || clienteData || {};
         const nombreCliente = this.escapeHtml(cliente.nombre || '—');
-        const celularCliente = this.escapeHtml(cliente.celular || '—');
+        const documentoCliente = this.escapeHtml(cliente.documento || '—');
+        const celularCliente = this.escapeHtml(cliente.telefono || cliente.celular || '—');
         const emailCliente = this.escapeHtml(cliente.email || '—');
         const direccionCliente = this.nl2br(cliente.direccion || '—');
         const ciudadCliente = this.escapeHtml(cliente.ciudad || '');
-        const notasCliente = this.nl2br(cliente.notas || '');
+        const notasCliente = this.nl2br(quoteData.observaciones || cliente.notas || '');
+        const vigenciaDias = Number(quoteData.vigenciaDias || cliente.vigenciaDias || 15);
+        const formaPago = this.escapeHtml(quoteData.formaPago || cliente.formaPago || empresa.condicionesPago || 'Por definir');
+        const fechaBase = quoteData.createdAt ? new Date(quoteData.createdAt) : new Date();
 
         const fechaEmision = new Intl.DateTimeFormat('es-CO', {
             day: '2-digit', month: 'long', year: 'numeric'
-        }).format(new Date());
+        }).format(fechaBase);
 
         const fechaVence = new Intl.DateTimeFormat('es-CO', {
             day: '2-digit', month: 'long', year: 'numeric'
-        }).format(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000));
+        }).format(new Date(fechaBase.getTime() + vigenciaDias * 24 * 60 * 60 * 1000));
+        const fechaVenceDate = new Date(fechaBase.getTime() + vigenciaDias * 24 * 60 * 60 * 1000);
+        const estadoDocumento = fechaVenceDate < new Date() ? 'Vencida' : this.capitalizar(quoteData.estado || 'Vigente');
 
         const logoTag = logoBase64
             ? `<img src="${logoBase64}" style="height:64px;width:auto;display:block;" alt="Logo">`
@@ -87,20 +98,24 @@ window.PDFGenerator = {
         const rows = cotizacionesList.map((item) => `
             <tr>
                 <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;vertical-align:top;">
-                    <div style="font-weight:700;font-size:12px;color:#0F1D35;margin-bottom:3px;">${this.capitalizar(item.tipo)}</div>
-                    <div style="font-size:10px;color:#8A93A6;">Vidrio ${item.tipo} — ${item.grosor}${String(item.grosor).includes('+') ? '' : 'mm'} espesor</div>
+                    <div style="font-weight:700;font-size:12px;color:#0F1D35;margin-bottom:3px;">${this.escapeHtml(this.capitalizar(item.tipo))}</div>
+                    <div style="font-size:10px;color:#8A93A6;">${this.escapeHtml(item.variante || 'Estándar')} · ${this.escapeHtml(item.grosor)}${String(item.grosor).includes('+') ? '' : ' mm'}</div>
+                    ${(Number(item.areaM2) && Number(item.areaFacturableM2) > Number(item.areaM2)) ? `<div style="margin-top:4px;font-size:9px;color:#8A93A6;">Área física ${Number(item.areaM2).toFixed(2)} m²</div>` : ''}
                     ${this.lineaAcabados(item)}
                 </td>
-                <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;text-align:center;font-size:12px;color:#3D5280;font-weight:600;vertical-align:middle;">
-                    ${item.grosor}${String(item.grosor).includes('+') ? '' : 'mm'}
+                <td style="padding:10px 8px;border-bottom:1px solid #EEF0F4;text-align:center;font-size:11px;color:#3D5280;font-weight:600;vertical-align:middle;">
+                    ${this.escapeHtml(item.anchoOriginal ?? item.ancho)} ${this.escapeHtml(item.unidad || 'm')} × ${this.escapeHtml(item.altoOriginal ?? item.alto)} ${this.escapeHtml(item.unidad || 'm')}
                 </td>
-                <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;text-align:center;font-size:12px;color:#3D5280;font-weight:600;vertical-align:middle;">
-                    ${item.anchoOriginal}m × ${item.altoOriginal}m
+                <td style="padding:10px 8px;border-bottom:1px solid #EEF0F4;text-align:center;font-size:11px;font-weight:700;color:#0F1D35;vertical-align:middle;">
+                    ${this.escapeHtml(item.cantidad)}
                 </td>
-                <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;text-align:center;font-size:12px;font-weight:700;color:#0F1D35;vertical-align:middle;">
-                    ${item.cantidad}
+                <td style="padding:10px 8px;border-bottom:1px solid #EEF0F4;text-align:right;font-size:10px;color:#3D5280;vertical-align:middle;">
+                    ${(Number(item.areaFacturableM2) || Number(item.areaM2) || 0).toFixed(2)} m²
                 </td>
-                <td style="padding:14px 18px;border-bottom:1px solid #EEF0F4;text-align:right;font-size:12px;font-weight:800;color:#0F1D35;vertical-align:middle;">
+                <td style="padding:10px 8px;border-bottom:1px solid #EEF0F4;text-align:right;font-size:10px;color:#3D5280;vertical-align:middle;">
+                    ${this.formatCOP(item.precioM2 || item.precio || 0)}
+                </td>
+                <td style="padding:10px 8px;border-bottom:1px solid #EEF0F4;text-align:right;font-size:11px;font-weight:800;color:#0F1D35;vertical-align:middle;">
                     ${this.formatCOP(item.total)}
                 </td>
             </tr>`
@@ -151,7 +166,7 @@ window.PDFGenerator = {
   .client-value { font-size: 12px; font-weight: 800; color: #0F1D35; word-break: break-word; }
   .client-value-small { font-size: 11px; font-weight: 700; color: #5C6B82; }
 
-  .table-section { padding: 0 52px 0 60px; }
+  .table-section { padding: 0 42px 0 50px; }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   thead th { background: #0F1D35; color: white; padding: 14px 18px; font-size: 10px; text-transform: uppercase; text-align: left; }
   thead th:first-child { border-radius: 8px 0 0 0; }
@@ -185,8 +200,8 @@ window.PDFGenerator = {
             ${logoTag}
             <div>
                 <div class="brand-sub">Calidad y Transparencia</div>
-                <div class="brand-name">Vidrios Alejo SAS</div>
-                <div class="brand-nit">NIT: 901.452.128-4</div>
+                <div class="brand-name">${this.escapeHtml(empresa.nombre)}</div>
+                <div class="brand-nit">NIT: ${this.escapeHtml(empresa.nit)}</div>
             </div>
         </div>
         <div class="doc-id">
@@ -213,7 +228,7 @@ window.PDFGenerator = {
         </div>
         <div class="info-card">
             <div class="info-label">Estado</div>
-            <div style="margin-top:4px;"><span class="badge">Vigente</span></div>
+            <div style="margin-top:4px;"><span class="badge">${this.escapeHtml(estadoDocumento)}</span></div>
         </div>
     </div>
 
@@ -227,6 +242,10 @@ window.PDFGenerator = {
             <div class="client-item">
                 <div class="client-label">Celular</div>
                 <div class="client-value">${celularCliente}</div>
+            </div>
+            <div class="client-item">
+                <div class="client-label">Documento / NIT</div>
+                <div class="client-value">${documentoCliente}</div>
             </div>
             <div class="client-item">
                 <div class="client-label">Correo</div>
@@ -250,10 +269,11 @@ window.PDFGenerator = {
         <table>
             <thead>
                 <tr>
-                    <th style="width:40%;">Producto</th>
-                    <th style="width:10%;text-align:center;">Grosor</th>
-                    <th style="width:20%;text-align:center;">Medidas</th>
-                    <th style="width:10%;text-align:center;">Cant.</th>
+                    <th style="width:26%;">Producto</th>
+                    <th style="width:17%;text-align:center;">Medidas</th>
+                    <th style="width:8%;text-align:center;">Cant.</th>
+                    <th style="width:12%;text-align:right;">Área facturable</th>
+                    <th style="width:17%;text-align:right;">Precio / m²</th>
                     <th style="width:20%;text-align:right;">Subtotal</th>
                 </tr>
             </thead>
@@ -271,23 +291,23 @@ window.PDFGenerator = {
     <div class="notes-section">
         <div style="font-size:11px;font-weight:800;color:#1B3A6B;margin-bottom:15px;text-transform:uppercase;">Condiciones Comerciales</div>
         <div class="notes-grid">
-            <div class="note-item"><span class="note-num">1</span><span>Válido por 15 días calendario.</span></div>
+            <div class="note-item"><span class="note-num">1</span><span>Válido por ${vigenciaDias} días calendario.</span></div>
             <div class="note-item"><span class="note-num">2</span><span>Sujeto a rectificación de medidas en obra.</span></div>
-            <div class="note-item"><span class="note-num">3</span><span>Se requiere un anticipo del 50% para iniciar la fabricación, el saldo restante se liquida contra entrega.</span></div>
+            <div class="note-item"><span class="note-num">3</span><span>Forma de pago: ${formaPago}.</span></div>
             <div class="note-item"><span class="note-num">4</span><span>Precios sujetos a cambios sin previo aviso hasta la confirmación formal del pedido.</span></div>
         </div>
     </div>
 
     <footer class="footer">
         <div style="font-size:11px;">
-            <strong>Vidrios Alejo SAS</strong><br>
-            Calle 12 #8-62, Ubaté - Cundinamarca<br>
-            @vidrios_alejo_sas
+            <strong>${this.escapeHtml(empresa.nombre)}</strong><br>
+            ${this.escapeHtml(empresa.direccion)}<br>
+            ${this.escapeHtml(empresa.instagram)}
         </div>
         <div class="footer-contact">
-            +57 322 934 0900<br>
-            contacto@vidriosalejo.com<br>
-            Lun – Sáb · 7:30 AM – 5:00 PM
+            ${this.escapeHtml(empresa.telefono)}<br>
+            ${this.escapeHtml(empresa.email)}<br>
+            ${this.escapeHtml(empresa.horario)}
         </div>
     </footer>
 </div>
@@ -295,7 +315,7 @@ window.PDFGenerator = {
 </html>`;
     },
 
-    async generarPDFBase64(cotizacionesGuardadas, clienteData) {
+    async generarPDFBase64(cotizacionesGuardadas, clienteData, quoteData = {}, companyData = {}) {
         if (!cotizacionesGuardadas || cotizacionesGuardadas.length === 0) {
             throw new Error('Agrega al menos un ítem.');
         }
@@ -304,9 +324,9 @@ window.PDFGenerator = {
 
         try {
             const logoBase64 = await this.getBase64Image('/img/vidrioslogo.png');
-            const refId = `VA-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+            const refId = quoteData.consecutivo || `VA-${Date.now().toString(36).toUpperCase().slice(-6)}`;
             const cliente = clienteData || {};
-            const htmlString = this.generarHTML(cotizacionesGuardadas, refId, logoBase64, cliente);
+            const htmlString = this.generarHTML(cotizacionesGuardadas, refId, logoBase64, cliente, quoteData, companyData);
 
             // Contenedor temporal (fuera de la vista)
             container = document.createElement('div');
@@ -322,7 +342,7 @@ window.PDFGenerator = {
             const element = container.querySelector('#pdf-content');
             if (!element) throw new Error('No se pudo preparar el contenido del PDF.');
 
-            const pdfFilename = `Cotizacion_${refId}.pdf`;
+            const pdfFilename = `Cotizacion_${String(refId).replace(/[^A-Za-z0-9_-]/g, '')}.pdf`;
             const opciones = {
                 margin: 0,
                 filename: pdfFilename,

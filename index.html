@@ -19,8 +19,8 @@
     <p class="slogan">Sistema de cotización — calidad y transparencia en cada proyecto</p>
     <div class="header-actions">
       <button type="button" id="logoutBtn" class="logout-button">Cerrar sesión</button>
-      <button type="button" class="btn-edit-precios" onclick="location.href='/editar-precios.html'">Editar precios</button>
-      <button type="button" id="users-admin-link" class="btn-edit-precios" onclick="location.href='/admin-usuarios.html'" hidden>Usuarios y roles</button>
+      <button type="button" class="btn-edit-precios" data-href="/catalogo.html">Catálogo y precios</button>
+      <button type="button" id="users-admin-link" class="btn-edit-precios" data-href="/admin-usuarios.html" hidden>Usuarios y roles</button>
     </div>
   </header>
 
@@ -30,14 +30,14 @@
       <p class="section-description">Seleccione el tipo de vidrio para generar su cotización. Los valores se calculan según la lista de precios vigente.</p>
 
       <div class="menu-buttons">
-        <button type="button" onclick="irCotizar('transparente')">Vidrio transparente</button>
-        <button type="button" onclick="location.href='/bronce.html'">Vidrio bronce</button>
-        <button type="button" onclick="location.href='/azul.html'">Vidrio azul</button>
-        <button type="button" onclick="location.href='/verde.html'">Vidrio verde</button>
-        <button type="button" onclick="irCotizar('gris')">Vidrio gris</button>
-        <button type="button" onclick="irCotizar('grabado')">Vidrio grabado</button>
-        <button type="button" onclick="irCotizar('espejo')">Espejo</button>
-        <button type="button" onclick="irCotizar('laminado')">Vidrio laminado</button>
+        <button type="button" data-tipo="transparente">Vidrio transparente</button>
+        <button type="button" data-tipo="bronce">Vidrio bronce</button>
+        <button type="button" data-tipo="azul">Vidrio azul</button>
+        <button type="button" data-tipo="verde">Vidrio verde</button>
+        <button type="button" data-tipo="gris">Vidrio gris</button>
+        <button type="button" data-tipo="grabado">Vidrio grabado</button>
+        <button type="button" data-tipo="espejo">Espejo</button>
+        <button type="button" data-tipo="transparente laminado">Vidrio laminado</button>
       </div>
     </section>
   </main>
@@ -53,15 +53,7 @@
     </div>
   </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  window.irCotizar = function(tipo) {
-    localStorage.setItem('tipoSeleccionado', tipo);
-    window.location.href = '/cotizar.html?tipo=' + encodeURIComponent(tipo);
-  };
-
-});
-</script>
+<script src="/js/home.js"></script>
   <script src="/js/session.js"></script>
   <script src="/js/theme.js"></script>
 </body>

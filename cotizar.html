@@ -28,6 +28,7 @@
     <button id="toggle-panel" class="panel-toggle">
       <i class="fas fa-list"></i> Lista de Cotizaciones
     </button>
+    <a class="panel-toggle" href="/cotizaciones.html"><i class="fas fa-clock-rotate-left"></i> Historial de cotizaciones</a>
 
     <div id="panel-lista" class="cotizacion-panel">
       <button class="cerrar-panel">×</button> 
@@ -44,10 +45,12 @@
     </div>
 
     <div class="nota-usuario">
-      <p><strong>Nota:</strong> Para poder cotizar, ingrese las medidas en metros y con punto como separador decimal (ej: 1.25).</p>
+      <p><strong>Nota:</strong> Elija el material y mida en metros, centímetros o milímetros. Las opciones dependen del catálogo vigente.</p>
     </div>
 
     <form id="cotizacion-form" class="cotizacion-form">
+      <div class="form-group"><label for="tipo-select">Tipo de vidrio:</label><select id="tipo-select" class="form-control" required></select></div>
+      <div class="form-group"><label for="variante-select">Variante:</label><select id="variante-select" class="form-control"><option value="">Estándar</option></select></div>
       <input type="hidden" name="tipo" id="tipo-input">
 
       <div class="form-group">
@@ -56,12 +59,15 @@
       </div>
 
       <div class="form-group">
-        <label class="espaciado-extra"><i class="fas fa-arrows-alt-h"></i> Ancho (m):</label>
+        <label for="unidad-medida">Unidad de medida:</label><select id="unidad-medida" class="form-control"><option value="m">Metros</option><option value="cm">Centímetros</option><option value="mm">Milímetros</option></select>
+      </div>
+      <div class="form-group">
+        <label class="espaciado-extra"><i class="fas fa-arrows-alt-h"></i> Ancho:</label>
         <input type="number" name="ancho" step="any" class="form-control" required>
       </div>
 
       <div class="form-group">
-        <label><i class="fas fa-arrows-alt-v"></i> Alto (m):</label>
+        <label><i class="fas fa-arrows-alt-v"></i> Alto:</label>
         <input type="number" name="alto" step="any" class="form-control" required>
       </div>
 
@@ -129,12 +135,13 @@
       <h3><i class="fas fa-user-tie"></i> Datos del solicitante</h3>
       <p>Estos datos se usarán para el PDF y el envío por correo.</p>
       <div class="cliente-datos-modal-body">
-        <form id="form-cliente-pdf" class="form-cliente-pdf" onsubmit="return false;">
+        <form id="form-cliente-pdf" class="form-cliente-pdf">
           <div class="datos-cliente-grid">
             <div class="form-group">
               <label for="cliente_nombre"><i class="fas fa-id-card"></i> Nombre:</label>
               <input type="text" id="cliente_nombre" name="cliente_nombre" class="form-control" required maxlength="120" />
             </div>
+            <div class="form-group"><label for="cliente_documento">Documento / NIT:</label><input type="text" id="cliente_documento" class="form-control" maxlength="40"></div>
             <div class="form-group">
               <label for="cliente_celular"><i class="fas fa-phone"></i> Celular (opcional):</label>
               <input type="tel" id="cliente_celular" name="cliente_celular" class="form-control" maxlength="25" placeholder="Ej: 3221234567" />
@@ -155,6 +162,8 @@
               <label for="cliente_notas"><i class="fas fa-sticky-note"></i> Notas (opcional):</label>
               <textarea id="cliente_notas" name="cliente_notas" class="form-control" maxlength="300" rows="2" placeholder="Ej: horario preferido, condiciones especiales, etc."></textarea>
             </div>
+            <div class="form-group"><label for="cliente_vigencia">Vigencia (días):</label><input type="number" id="cliente_vigencia" class="form-control" value="15" min="1" max="365"></div>
+            <div class="form-group"><label for="cliente_pago">Forma de pago:</label><input type="text" id="cliente_pago" class="form-control" maxlength="120" placeholder="Ej. 50% anticipo"></div>
           </div>
 
           <div class="modal-actions modal-actions-cliente-pdf">
