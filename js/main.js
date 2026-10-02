@@ -292,13 +292,22 @@ window.addEventListener('DOMContentLoaded', async () => {
       };
       const refreshThickness = () => {
         const rows = catalogoCotizador.filter((g) => g.tipo === tipoSelect.value && g.variante === (varianteSelect.value || '') && g.activo);
-        poblarSelectGrosores(grosorSelect, rows.map((g) => g.grosorMm));
-        const selected = rows.find((g) => g.grosorMm === grosorSelect.value);
+        const previousThickness = grosorSelect.value;
+        const availableThicknesses = [...new Set(rows.map((g) => String(g.grosorMm)))].sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
+        poblarSelectGrosores(grosorSelect, availableThicknesses);
+        if (availableThicknesses.includes(previousThickness)) grosorSelect.value = previousThickness;
+        updateSelectedGlassState();
+      };
+      const updateSelectedGlassState = () => {
+        const selected = catalogoCotizador.find((g) => g.tipo === tipoSelect.value
+          && g.variante === (varianteSelect.value || '')
+          && String(g.grosorMm) === grosorSelect.value
+          && g.activo);
         if (botonCotizar) botonCotizar.disabled = !selected || Number(selected.precioM2) <= 0;
       };
       tipoSelect.addEventListener('change', refreshCatalogChoices);
       varianteSelect.addEventListener('change', refreshThickness);
-      grosorSelect.addEventListener('change', refreshThickness);
+      grosorSelect.addEventListener('change', updateSelectedGlassState);
       refreshCatalogChoices();
     } catch (err) {
       tipoSelect.replaceChildren(new Option(err.message.startsWith('La base respondió') ? 'Catálogo vacío' : 'No disponible', ''));
