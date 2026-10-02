@@ -12,6 +12,10 @@
   --va-border: #262d45;
   --va-text: #edf3ff;
   --va-muted: #a2aec7;
+  --va-glass-button: #1e5aa8;
+  --va-glass-button-hover: #2868b9;
+  --va-glass-button-text: #ffffff;
+  --va-glass-button-focus: rgba(28, 207, 217, .65);
   --va-gradient: linear-gradient(115deg, var(--va-cyan), var(--va-blue) 58%, var(--va-indigo));
   --va-shadow: 0 24px 70px rgba(0, 0, 0, .28);
 }
@@ -24,6 +28,10 @@
   --va-border: #dce5f2;
   --va-text: #182238;
   --va-muted: #60708b;
+  --va-glass-button: #2563eb;
+  --va-glass-button-hover: #1d4ed8;
+  --va-glass-button-text: #ffffff;
+  --va-glass-button-focus: rgba(37, 99, 235, .4);
   --va-shadow: 0 22px 60px rgba(30, 58, 100, .1);
 }
 
@@ -108,6 +116,22 @@ body::before {
   transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
 }
 .menu-buttons button:hover, .subtype-btn:hover, .btn-submit:hover, .btn-cotizar:hover, .btn-guardar:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(28, 113, 217, .32) !important; }
+.menu-buttons button {
+  color: var(--va-glass-button-text) !important;
+  background: var(--va-glass-button) !important;
+  box-shadow: none !important;
+  transition: transform .16s ease, background-color .16s ease, outline-color .16s ease;
+}
+.menu-buttons button:hover {
+  background: var(--va-glass-button-hover) !important;
+  box-shadow: none !important;
+  transform: translateY(-1px);
+}
+.menu-buttons button:active { transform: translateY(0); }
+.menu-buttons button:focus-visible {
+  outline: 3px solid var(--va-glass-button-focus);
+  outline-offset: 3px;
+}
 button, a, input, select, textarea { transition-duration: .2s; }
 input, select, textarea, .form-control, .input-precio, .selector-tipo, .input-contacto {
   color: var(--va-text) !important;
