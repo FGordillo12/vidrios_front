@@ -4,8 +4,16 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
     const roleDialog = document.getElementById('role-confirm');
     const roleDialogText = document.getElementById('role-confirm-text');
     const roleDialogAccept = document.getElementById('role-confirm-accept');
-    let pendingRoleChange = null;
+    const saveRolesButton = document.getElementById('save-role-changes');
+    const pendingRoleChanges = new Map();
     const showMessage = (text) => { message.textContent = text; };
+    const roleLabel = (role) => role === 'admin' ? 'Administrador' : 'Usuario';
+
+    function refreshRoleSaveButton() {
+      const count = pendingRoleChanges.size;
+      saveRolesButton.disabled = count === 0;
+      saveRolesButton.textContent = count ? `Guardar cambios (${count})` : 'Guardar cambios';
+    }
 
     async function loadUsers() {
       try {
@@ -22,21 +30,14 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
           [['user', 'Usuario'], ['admin', 'Administrador']].forEach(([value, label]) => {
             const option = document.createElement('option'); option.value = value; option.textContent = label; role.append(option);
           });
-          role.value = user.role;
+          const pendingChange = pendingRoleChanges.get(user._id);
+          role.value = pendingChange?.role || user.role;
           const originalRole = user.role;
-          const saveRole = document.createElement('button');
-          saveRole.className = 'user-action save-role'; saveRole.type = 'button'; saveRole.textContent = 'Guardar cambios'; saveRole.disabled = true;
           role.addEventListener('change', () => {
-            saveRole.disabled = role.value === originalRole;
-            showMessage(role.value === originalRole ? 'No hay cambios de rol pendientes.' : `Cambio de rol pendiente para ${user.username}. Pulsa «Guardar cambios» para continuar.`);
-          });
-          saveRole.addEventListener('click', () => {
-            if (role.value === originalRole) return;
-            const previousLabel = role.options[role.selectedIndex].text;
-            const oldLabel = [...role.options].find((option) => option.value === originalRole)?.text || originalRole;
-            roleDialogText.textContent = `¿Confirmas cambiar el rol de ${user.username} de ${oldLabel} a ${previousLabel}? El acceso se actualizará de inmediato.`;
-            pendingRoleChange = { id: user._id, role: role.value };
-            roleDialog.showModal();
+            if (role.value === originalRole) pendingRoleChanges.delete(user._id);
+            else pendingRoleChanges.set(user._id, { id: user._id, username: user.username, originalRole, role: role.value });
+            refreshRoleSaveButton();
+            showMessage(pendingRoleChanges.size ? `${pendingRoleChanges.size} cambio${pendingRoleChanges.size === 1 ? '' : 's'} de rol pendiente${pendingRoleChanges.size === 1 ? '' : 's'}.` : 'No hay cambios de rol pendientes.');
           });
           roleCell.append(role);
           const statusCell = document.createElement('td');
@@ -46,12 +47,13 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
           const actionCell = document.createElement('td');
           const action = document.createElement('button'); action.className = 'user-action'; action.type = 'button'; action.textContent = user.active ? 'Desactivar' : isPending ? 'Aprobar cuenta' : 'Activar';
           action.addEventListener('click', () => updateUser(user._id, { active: !user.active }));
-          const actionGroup = document.createElement('div'); actionGroup.className = 'user-actions'; actionGroup.append(saveRole, action); actionCell.append(actionGroup);
+          const actionGroup = document.createElement('div'); actionGroup.className = 'user-actions'; actionGroup.append(action); actionCell.append(actionGroup);
           row.append(name, email, roleCell, statusCell, actionCell); body.append(row);
         });
         if (!users.length) body.innerHTML = '<tr><td colspan="5">No hay usuarios registrados.</td></tr>';
         const pendingCount = users.filter((user) => user.approvalStatus === 'pending').length;
         showMessage(`${users.length} cuenta${users.length === 1 ? '' : 's'} en el sistema. ${pendingCount ? `${pendingCount} pendiente${pendingCount === 1 ? '' : 's'} de aprobación.` : ''}`);
+        refreshRoleSaveButton();
       } catch (error) { showMessage(error.message); }
     }
 
@@ -72,22 +74,40 @@ const api = typeof window.API_BASE === 'string' ? window.API_BASE : (['localhost
       }
     }
 
-    document.getElementById('role-confirm-cancel').addEventListener('click', () => {
-      roleDialog.close();
-      pendingRoleChange = null;
-    });
+    document.getElementById('role-confirm-cancel').addEventListener('click', () => roleDialog.close());
     roleDialog.addEventListener('click', (event) => {
-      if (event.target === roleDialog) { roleDialog.close(); pendingRoleChange = null; }
+      if (event.target === roleDialog) roleDialog.close();
+    });
+    saveRolesButton.addEventListener('click', () => {
+      if (!pendingRoleChanges.size) return;
+      const changes = [...pendingRoleChanges.values()];
+      const summary = changes.map((change) => `• ${change.username}: ${roleLabel(change.originalRole)} → ${roleLabel(change.role)}`).join('\n');
+      roleDialogText.textContent = `¿Confirmas guardar estos ${changes.length} cambio${changes.length === 1 ? '' : 's'} de rol?\n\n${summary}`;
+      roleDialog.showModal();
     });
     roleDialogAccept.addEventListener('click', async () => {
-      if (!pendingRoleChange) return;
+      const changes = [...pendingRoleChanges.values()];
+      if (!changes.length) return;
       roleDialogAccept.disabled = true;
-      const succeeded = await updateUser(pendingRoleChange.id, { role: pendingRoleChange.role });
+      saveRolesButton.disabled = true;
+      const outcomes = await Promise.all(changes.map(async (change) => {
+        try {
+          const response = await fetch(`${api}/api/admin/users/${encodeURIComponent(change.id)}`, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: change.role })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'No se pudo actualizar el rol');
+          pendingRoleChanges.delete(change.id);
+          return { username: change.username, error: null };
+        } catch (error) { return { username: change.username, error: error.message }; }
+      }));
+      await loadUsers();
       roleDialogAccept.disabled = false;
-      if (succeeded) {
-        roleDialog.close();
-        pendingRoleChange = null;
-      }
+      roleDialog.close();
+      const failed = outcomes.filter((outcome) => outcome.error);
+      showMessage(failed.length
+        ? `Se guardaron ${outcomes.length - failed.length} cambio(s). No se pudieron guardar: ${failed.map((outcome) => outcome.username).join(', ')}. Los fallidos siguen pendientes.`
+        : `Se guardaron ${outcomes.length} cambio${outcomes.length === 1 ? '' : 's'} de rol.`);
     });
 
     loadUsers();

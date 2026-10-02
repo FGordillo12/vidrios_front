@@ -12,6 +12,10 @@
     .users-card { padding: clamp(1.25rem, 4vw, 2rem); border: 1px solid var(--va-border); border-radius: 24px; background: var(--va-surface); box-shadow: var(--va-shadow); overflow-x: auto; }
     .users-card h1 { margin: 0 0 .5rem; font-size: clamp(1.6rem, 4vw, 2.2rem); }
     .users-card p { color: var(--va-muted); margin: 0 0 1.5rem; }
+    :root[data-theme="light"] .users-card p,
+    :root[data-theme="light"] .users-table th,
+    :root[data-theme="light"] .users-message,
+    :root[data-theme="light"] .role-confirm p { color: #111827; }
     .users-table { width: 100%; border-collapse: collapse; min-width: 760px; }
     .users-table th, .users-table td { padding: .9rem .75rem; border-bottom: 1px solid var(--va-border); text-align: left; }
     .users-table th { color: var(--va-muted); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
@@ -23,6 +27,7 @@
     :root[data-theme="light"] .user-status.inactive { background: #fee2e2; color: #b91c1c; }
     :root[data-theme="light"] .user-status.pending { background: #fef3c7; color: #92400e; }
     .user-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .users-toolbar { display: flex; justify-content: flex-end; margin: -.7rem 0 1rem; }
     .user-action { min-height: 40px; padding: .45rem .8rem; border: 1px solid var(--va-border); border-radius: 10px; color: var(--va-text); background: var(--va-surface-raised); font-weight: 650; cursor: pointer; }
     .user-action:hover { border-color: var(--va-glass-button); }
     .user-action.save-role { color: var(--va-glass-button-text); background: var(--va-glass-button); border-color: var(--va-glass-button); }
@@ -35,7 +40,7 @@
     .role-confirm { width: min(440px, calc(100% - 2rem)); padding: 1.5rem; border: 1px solid var(--va-border); border-radius: 20px; color: var(--va-text); background: var(--va-surface); box-shadow: var(--va-shadow); }
     .role-confirm::backdrop { background: rgba(8, 15, 30, .62); backdrop-filter: blur(3px); }
     .role-confirm h2 { margin: 0 0 .65rem; }
-    .role-confirm p { color: var(--va-muted); line-height: 1.55; }
+    .role-confirm p { color: var(--va-muted); line-height: 1.55; white-space: pre-line; }
     .role-confirm-actions { display: flex; justify-content: flex-end; gap: .65rem; margin-top: 1.3rem; }
     @media (max-width: 520px) { .users-page { padding: 1rem .65rem; } .users-card { padding: 1rem; border-radius: 18px; } }
   </style>
@@ -47,8 +52,9 @@
       <h1>Usuarios y roles</h1>
       <p>Administra el acceso de las cuentas registradas.</p>
       <div id="users-message" class="users-message" aria-live="polite"></div>
+      <div class="users-toolbar"><button id="save-role-changes" class="user-action save-role" type="button" disabled>Guardar cambios</button></div>
       <table class="users-table">
-        <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acción</th></tr></thead>
         <tbody id="users-list"><tr><td colspan="5">Cargando usuarios…</td></tr></tbody>
       </table>
     </section>
