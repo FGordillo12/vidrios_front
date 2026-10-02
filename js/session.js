@@ -41,7 +41,8 @@
         throw error;
       }
       if (response.status >= 500) {
-        const error = new Error('El servidor está activo, pero no logra conectarse a MongoDB. Revisa vidrios_back/.env y el estado de MongoDB Atlas.');
+        const detail = await response.clone().json().catch(() => null);
+        const error = new Error(detail?.error || 'El servidor está activo, pero no logra conectarse a MongoDB. Revisa vidrios_back/.env y el estado de MongoDB Atlas.');
         error.status = response.status;
         throw error;
       }
