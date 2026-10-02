@@ -46,10 +46,10 @@ function labelGrosor(g) {
   return s.includes('+') ? `${s} (laminado)` : `${s} mm`;
 }
 
-function convertirMedidaACentimetros(medida, unidad = 'cm') {
+function convertirMedidaAMetros(medida, unidad = 'm') {
   const valor = Number.parseFloat(String(medida ?? '').replace(',', '.'));
   if (!Number.isFinite(valor)) return medida;
-  const factor = unidad === 'm' ? 100 : unidad === 'mm' ? 0.1 : 1;
+  const factor = unidad === 'cm' ? 0.01 : unidad === 'mm' ? 0.001 : 1;
   return Number((valor * factor).toFixed(4));
 }
 
@@ -349,9 +349,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (item.variante) document.getElementById('variante-select').value = item.variante;
         document.getElementById('variante-select').dispatchEvent(new Event('change'));
         document.getElementById('grosor').value = item.grosor;
-        document.getElementById('cotizacion-form').elements.ancho.value = convertirMedidaACentimetros(item.anchoOriginal ?? item.ancho, item.unidad || 'm');
-        document.getElementById('cotizacion-form').elements.alto.value = convertirMedidaACentimetros(item.altoOriginal ?? item.alto, item.unidad || 'm');
-        document.getElementById('unidad-medida').value = 'cm';
+        document.getElementById('cotizacion-form').elements.ancho.value = convertirMedidaAMetros(item.anchoOriginal ?? item.ancho, item.unidad || 'm');
+        document.getElementById('cotizacion-form').elements.alto.value = convertirMedidaAMetros(item.altoOriginal ?? item.alto, item.unidad || 'm');
+        document.getElementById('unidad-medida').value = 'm';
         document.getElementById('cotizacion-form').elements.cantidad.value = item.cantidad;
         document.getElementById('vidrio-pulido').checked = !!item.vidrioPulido;
         document.getElementById('vidrio-sandblast').checked = !!item.vidrioSandblasteado;
@@ -391,8 +391,8 @@ if (cotizacionForm) {
     const anchoOriginal = parseFloat(anchoOriginalTexto);
     const altoOriginal = parseFloat(altoOriginalTexto);
 
-    const unidad = 'cm';
-    const factor = 0.01;
+    const unidad = 'm';
+    const factor = 1;
     data.ancho = anchoOriginal * factor;
     data.alto = altoOriginal * factor;
     data.cantidad = parseInt(data.cantidad, 10);
@@ -415,8 +415,8 @@ if (cotizacionForm) {
     const payload = {
       tipo: data.tipo,
       variante: document.getElementById('variante-select')?.value || '',
-      ancho: data.ancho,
-      alto: data.alto,
+      ancho: aproximarMedida(data.ancho),
+      alto: aproximarMedida(data.alto),
       cantidad: data.cantidad,
       grosor: data.grosor,
       vidrioPulido,
