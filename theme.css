@@ -16,6 +16,11 @@
   --va-glass-button-hover: #2868b9;
   --va-glass-button-text: #ffffff;
   --va-glass-button-focus: rgba(28, 207, 217, .65);
+  --va-field-bg: #1b2236;
+  --va-field-border: #46536d;
+  --va-field-focus: #35c4d0;
+  --va-field-focus-ring: rgba(28, 207, 217, .22);
+  --va-field-placeholder: #a2aec7;
   --va-gradient: linear-gradient(115deg, var(--va-cyan), var(--va-blue) 58%, var(--va-indigo));
   --va-shadow: 0 24px 70px rgba(0, 0, 0, .28);
 }
@@ -32,6 +37,11 @@
   --va-glass-button-hover: #1d4ed8;
   --va-glass-button-text: #ffffff;
   --va-glass-button-focus: rgba(37, 99, 235, .4);
+  --va-field-bg: #f3f6fb;
+  --va-field-border: #8494aa;
+  --va-field-focus: #1d4ed8;
+  --va-field-focus-ring: rgba(37, 99, 235, .2);
+  --va-field-placeholder: #596b84;
   --va-shadow: 0 22px 60px rgba(30, 58, 100, .1);
 }
 
@@ -135,14 +145,14 @@ body::before {
 button, a, input, select, textarea { transition-duration: .2s; }
 input, select, textarea, .form-control, .input-precio, .selector-tipo, .input-contacto {
   color: var(--va-text) !important;
-  background: var(--va-surface-raised) !important;
-  border: 1px solid var(--va-border) !important;
+  background: var(--va-field-bg) !important;
+  border: 1px solid var(--va-field-border) !important;
   border-radius: 12px !important;
 }
-input::placeholder, textarea::placeholder { color: var(--va-muted) !important; opacity: .8; }
+input::placeholder, textarea::placeholder { color: var(--va-field-placeholder) !important; opacity: 1; }
 input:focus, select:focus, textarea:focus, .form-control:focus, .input-precio:focus {
-  border-color: var(--va-cyan) !important;
-  box-shadow: 0 0 0 4px rgba(28, 207, 217, .13) !important;
+  border-color: var(--va-field-focus) !important;
+  box-shadow: 0 0 0 4px var(--va-field-focus-ring) !important;
   outline: 0;
 }
 .form-group label, .input-label, .selector-container, .checkbox-label, .acabados-titulo, .sandblast-label { color: var(--va-text) !important; }
